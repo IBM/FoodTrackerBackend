@@ -4,7 +4,7 @@ The current implementation of the [Kitura FoodServer](README.md) has support for
 ### Retrieving Meals from the FoodServer  
 The following code can be added to the FoodTracker app and will query the saved Meals from the server, and update the TableView:  
 ```swift
-    private func loadFromServer(meal: Meal) {
+    private func loadFromServer() {
         guard let client = KituraKit(baseURL: "http://localhost:8080") else {
             print("Error creating KituraKit client")
             return
