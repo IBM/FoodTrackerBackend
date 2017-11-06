@@ -53,7 +53,7 @@ open FoodTracker.xcodeproj
     3. Check that you receive a “Meals successfully saved.” message in the console
 
 ## Building a Kitura Backend
-The Food Tracker application stores the meal data to the local device, which means its not possible to share the data with other users, or to build an additonal web interface for the application. The following steps show you have to create a Kitura Backend to allow you to store and share the data.
+The Food Tracker application stores the meal data to the local device, which means its not possible to share the data with other users, or to build an additional web interface for the application. The following steps show you have to create a Kitura Backend to allow you to store and share the data.
 
 ### 1. Initialize a Kitura Server Project
 1. Create a directory for the server project 
@@ -86,31 +86,31 @@ The `init` command has created a fully running Kitura application, but one which
 3. Add the Meal.swift file into the FoodServer project  
    1. Select the yellow Sources > Application folder in the left hand explorer menu  
    2. Click right mouse and select Add Files to "FoodServer"... 
-   3. Select the Meal.swift file
-   4. Select the Options button and select "Application" from "Add to targets:"
-   4. Click Add
+   3. Single left click the Meal.swift file found in FoodTrackerBackend > iOS > FoodTracker > FoodTracker
+   4. Select the Options button, Scroll down about halfway through the "Add to targets" and tick the "Application"
+   5. Untick any other options in "add to targets" and click Add
 4. Add a dictionary to the Application.swift file to store the Meal types  
    1. Open the Sources > Application > Application.swift file
-   2. Add a "mealStore" into the App class using the following: 
-      On the line below `let cloudEnv = CloudEnv()` add:  
+   2. Add a "mealstore" inside the app class,  by inserting the following code:
       ```
       private var mealStore: [String: Meal] = [:] 
       ```
+      On the line below `let cloudEnv = CloudEnv()`
 
 This now provides a simple dictionary to store Meal data passed to the FoodServer from the FoodTracker app.
 
-### 2. Create a REST API to allow FoodTracker to store Meals
+### 3. Create a REST API to allow FoodTracker to store Meals
 REST APIs typically consist of a HTTP request using a verb such as POST, PUT, GET or DELETE along with a URL and an optional data payload. The server then handles the request and responds with an optional data payload.
 
 A request to store data typically consists of a POST request with the data to be stored, which the server then handles and responds with a copy of the data that has just been stored.
 
 1. Register a handler for a `POST` request on `/meals` that stores the data  
-Add the following into the `postInit()` function:
+Add the following into the `postInit()` function in the App class:
 ```swift
 router.post("/meals", handler: storeHandler)
 ```
 2. Implement the storeHandler that receives a Meal, and returns the stored Meal  
-Add the following as a function in the App class:  
+Add the following code as a function in the App class, beneath the postInit() function:  
 ```swift
     func storeHandler(meal: Meal, completion: (Meal?, RequestError?) -> Void ) -> Void {
         mealStore[meal.name] = meal 
@@ -126,7 +126,7 @@ Add the following into the `postInit()` function:
 	router.get("/meals", handler: loadHandler)
 ```
 4. Implement the loadHandler that returns the stored Meals as an array.      
-Add the following as a function in the App class:
+Add the following as another function in the App class:
 ```swift
     func loadHandler(completion: ([Meal]?, RequestError?) -> Void ) -> Void {
 	    let meals: [Meal] = self.mealStore.map({ $0.value })
@@ -134,12 +134,12 @@ Add the following as a function in the App class:
     }
 ```
 
-### 2. Test the newly created REST API
+### 4. Test the newly created REST API
 
 
 1. Run the server project in Xcode
-    1. Edit the scheme by clicking on the "FoodServer-Package > My Mac" seciton of the toolbar and selecting "Edit scheme"
-    2. Select and Executable of FoodServer in the provided dialog box and click Close
+    1. Edit the scheme by clicking on the "FoodServer-Package" section on the top-left the toolbar and selecting "Edit scheme"
+    2. In "Run" click on the "Executable" dropdown, select FoodServer and click Close
     3. Press the Run button or use the ⌘+R key shortcut.
     4. Select "Allow incoming network connections" if you are prompted.
 
@@ -182,7 +182,7 @@ curl -X GET \
   http://localhost:8080/meals \
   -H 'content-type: application/json' 
 ```
-This should now return a single entry array containng the Meal that was stored by the POST request, eg:  
+This should now return a single entry array containing the Meal that was stored by the POST request, eg:  
 ```
 [{"name":"test","photo":"0e430e3a","rating":1}]
 ```
@@ -192,10 +192,10 @@ This should now return a single entry array containng the Meal that was stored b
 Any package that can make REST calls from an iOS app is sufficient to make the connection to the Kitura FoodServer to store and retrieve the Meals. Kitura itself provides a client connector called [KituraKit](https://github.com/ibm-swift/kiturakit) which makes it easy to connect to Kitura using shared data types, in our case Meals, using an API that is almost identical on the client and the server. In this example we'll use KituraKit to make the connection.
 
 ### Install KituraKit into the FoodTracker app
-KituraKit is designed to be used both in iOS apps and in server projects. Currently the easiest way to install KituraKit into an iOS app it to download a bundling containing KituraKit and its depdendencies, and to install it into the app as a CocoaPod.
+KituraKit is designed to be used both in iOS apps and in server projects. Currently the easiest way to install KituraKit into an iOS app it to download a bundling containing KituraKit and its dependencies, and to install it into the app as a CocoaPod.
 
-1. Close the Xcode project if it is open
-Installing the KituraKit bundle as a CocoaPod will edit the project and create a workspace so it is best if the project is closed.
+1. If the "FoodTracker" Xcode project it is open, close it.
+Installing the KituraKit bundle as a CocoaPod will edit the project and create a workspace, so it is best if the project is closed.
 2. Download the KituraKit for iOS bundle  
 KituraKit for iOS can be downloaded from the [KituraKit Releases](https://github.com/IBM-Swift/KituraKit/releases) page by choosing the latest "KituraKit.zip" file, but the easiest way it to use the Kitura command line.
 ```
@@ -303,7 +303,7 @@ This should now return an array containing the Meals that was stored by the POST
 If you have sufficient time, the following tasks can be completed to update your application.
 
 ### Add Support for Retrieving and Deleting Meals from the FoodServer
-The current implementation of the Kitura FoodServer has support for retrieving all of the stored Meals using a `GET` request on `/meals`, but the FoodTracker app is currently only saving the Meals to the FoodServer. The folloing contains the steps to add [Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md)
+The current implementation of the Kitura FoodServer has support for retrieving all of the stored Meals using a `GET` request on `/meals`, but the FoodTracker app is currently only saving the Meals to the FoodServer. The following contains the steps to add [Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md)
 
 ### Add a Web Application to the Kitura server
 Now that the Meals from the FoodTracker app are being stored on a server, it becomes possible to start building a web application that also provides users with access to the stored Meal data.
