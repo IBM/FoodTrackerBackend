@@ -53,7 +53,6 @@ Note that rather than receiving a Meal, this receives an `id`. The `id` is an `I
             print("Error creating KituraKit client")
             return
         }
-        let client = KituraKit(baseURL: "http://localhost:8080")
         client.delete("/meal", identifier: meal.name) { (error: Error?) in
             guard error == nil else {
                 print("Error deleting meal from Kitura: \(error!)")
