@@ -34,7 +34,7 @@ Support for deleting Meals from the FoodServer can be added by adding a REST API
 
 1. The following code adds a DELETE handler to the FoodServer for a single Meal:  
 ```swift
-    router.delete("/meal", codableHandler: deleteHandler)
+    router.delete("/meal", handler: deleteHandler)
 ```  
 With the following handler implementation:  
 ```swift
