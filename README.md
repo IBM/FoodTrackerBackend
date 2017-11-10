@@ -19,7 +19,7 @@ This tutorial teaches how to create a [Kitura Swift backend](http://kitura.io) f
 1. Install the [Kitura CLI](https://github.com/ibm-swift/kitura-cli):  
    1. Configure the Kitura homebrew tap  
    `brew tap ibm-swift/kitura`  
-   2. Install the Kiura CLI from homebrew  
+   2. Install the Kitura CLI from homebrew  
    `brew install kitura`
 
 2. Ensure you have CocoaPods installed  
