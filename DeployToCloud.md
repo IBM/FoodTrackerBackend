@@ -6,7 +6,7 @@ Go to the following URL, fill out the form and press "Create Account":
 https://console.bluemix.net/registration?cm_sp=dw-bluemix-_-swift-_-devcenter
 
 **Install the IBM Developer Tools**  
-Run the `init` command of the Kitura CLI:
+Run the `idt` command of the Kitura CLI:
 ```
 kitura idt
 ```
@@ -14,7 +14,7 @@ kitura idt
 **Obtain a GitHub ID**  
 Go to the following URL, enter Username, Email and Password and press "Sign up for GitHub":  
 https://github.com/
- 
+
 **Install the Git CLI**  
 `brew install git`  
 
@@ -27,12 +27,12 @@ Before deploying to the cloud, it is useful to be able to build and test the Kit
    ```
    cd ~/FoodTrackerBackend/FoodServer/
    ```
-2. Build your Kitura application for Linux: 
+2. Build your Kitura application for Linux:
    ```
    kitura build  
    ```
-   This builds your Kitura application using a Linux Ubuntu 14.04 Docker container locally on your laptop, ensuring that the application will compile successfull when deployed to the cloud.
-3. Run you Kitura application on Linux
+   This builds your Kitura application using a Linux Ubuntu 14.04 Docker container locally on your laptop, ensuring that the application will compile successfully when deployed to the cloud.
+3. Run your Kitura application on Linux
    ```
    kitura run
    ```
@@ -45,7 +45,7 @@ Before deploying to the cloud, it is useful to be able to build and test the Kit
    ```
 
 ## Deploying to IBM Cloud
-There are two main methods to deploying your application to IBM Cloud:  
+There are two main methods for deploying your application to IBM Cloud:  
 1. Using the IBM Developer Tools CLI  
 2. Using the IBM Cloud DevOps pipelines  
 
@@ -73,13 +73,13 @@ There are two main methods to deploying your application to IBM Cloud:
 
 ### Option 2: IBM Cloud DevOps Pipelines
 
-In order to use the IBM Cloud DevOps pipelines to build, test and deploy your project, you need to host your project in a Git repositiory that is visible to IBM Cloud. The easiest way to do this is using GitHub.
+In order to use the IBM Cloud DevOps pipelines to build, test and deploy your project, you need to host your project in a Git repository that is visible to IBM Cloud. The easiest way to do this is using GitHub.
 
 #### Create a GitHub project
 1. Go to your GitHub account  
    http://github.com
 2. Go to your profile by clicking on your avatar in the top right hand corner.
-3. Select the "Repositorites" tab 
+3. Select the "Repositories" tab
 4. Select the green "New" button
 5. Give your repository a name and press "Create repository"  
 **Note:** Keep this page for use later
@@ -89,17 +89,16 @@ In order to use the IBM Cloud DevOps pipelines to build, test and deploy your pr
 1. Go to the root directory of your FoodTrackerServer project
 
 ```
-cd ~/FoodTrackerBackend-Workshop/Server/FoodTrackerServer/
+cd ~/FoodTrackerBackend/Server/FoodTrackerServer/
 ```
 2. Initialise a local git project  
 `git init`
 3. Add all your files to the project  
 `git add -A`
-4. Check those file in by as a "commit"  
-`git commit -m "Initial commit"` 
+4. Check those files in as a "commit"  
+`git commit -m "Initial commit"`
 6. Push the commit to GitHub  
-Use the two lines under "…or push an existing repository from the command line" from the page dispalyed when you created your GitHub page.
-
+Use the two lines under "…or push an existing repository from the command line" from the page displayed when you created your GitHub project.
 7. Reload the GitHub project page
 
 #### Create an IBM Cloud DevOps Toolchain for your project
@@ -111,4 +110,3 @@ Use the two lines under "…or push an existing repository from the command line
 5. Wait for the "Deploy Stage" to complete
 6. Click the link under "Last Execution Result" to check that the Kitura server is running once its status button turns green.
 7. Open your browser to the deployed provided URL to see the application running. You can now update the URL used with KituraKit in the FoodTracker application to connect from the iOS app.
- 

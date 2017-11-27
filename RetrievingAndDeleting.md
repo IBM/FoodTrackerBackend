@@ -28,7 +28,7 @@ The following code can be added to the FoodTracker app and will query the saved 
 Try inserting this into the FoodTracker app and loading the Meals from the FoodServer.
 
 ### Deleting Meals from the FoodServer  
-The design of the FoodTracker app is such that it saves all of the Meals when any Meal is added or removed, overwriting the previous store of Meals. Whilst this provides an implememtation, it is not one that scales to large numbers of Meals.
+The design of the FoodTracker app is such that it saves all of the Meals when any Meal is added or removed, overwriting the previous store of Meals. Whilst this provides an implementation, it is not one that scales to large numbers of Meals.
 
 Support for deleting Meals from the FoodServer can be added by adding a REST API that responds to a DELETE request, with an additional identifier that provides information about which meal to delete.
 
