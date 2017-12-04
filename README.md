@@ -5,8 +5,8 @@
 </p>
 
 <p align="center">
-<a href= "http://swift-at-ibm-slack.mybluemix.net/"> 
-    <img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg"  alt="Slack"> 
+<a href= "http://swift-at-ibm-slack.mybluemix.net/">
+    <img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg"  alt="Slack">
 </a>
 </p>
 
@@ -25,7 +25,7 @@ This tutorial teaches how to create a [Kitura Swift backend](http://kitura.io) f
 2. Ensure you have CocoaPods installed  
    1. Install CocoaPods:
    `sudo gem install cocoapods`
-   
+
 3. Clone this project from GitHub to your machine (don't use the Download ZIP option):
    ```
    cd ~
@@ -47,16 +47,16 @@ cd ~/FoodTrackerBackend/iOS/FoodTracker
 open FoodTracker.xcodeproj
 ```  
 
-3. Run the project to ensure that its working  
+3. Run the project to ensure that it's working  
     1. Press the Run button or use the ⌘+R key shortcut.  
     2. Add a meal in the Simulator by clicking the '+' button, providing a name, selecting a photo and a rating and clicking "Save".
     3. Check that you receive a “Meals successfully saved.” message in the console
 
 ## Building a Kitura Backend
-The Food Tracker application stores the meal data to the local device, which means its not possible to share the data with other users, or to build an additional web interface for the application. The following steps show you have to create a Kitura Backend to allow you to store and share the data.
+The Food Tracker application stores the meal data to the local device, which means it's not possible to share the data with other users, or to build an additional web interface for the application. The following steps show you how to create a Kitura Backend to allow you to store and share the data.
 
 ### 1. Initialize a Kitura Server Project
-1. Create a directory for the server project 
+1. Create a directory for the server project
 ```
 mkdir ~/FoodTrackerBackend/FoodServer
 cd ~/FoodTrackerBackend/FoodServer
@@ -68,9 +68,9 @@ kitura init
 ```  
 The Kitura CLI will now create and build an starter Kitura application for you. This includes adding best-practice implementations of capabilities such as configuration, health checking and monitoring to the application for you.
 
-More information about the [project structure](http://kitura.io/en/starter/generator/project_layout_reference.html) is available on kitura.io. 
- 
-### 2. Create an in-memory data store for Meals 
+More information about the [project structure](http://kitura.io/en/starter/generator/project_layout_reference.html) is available on kitura.io.
+
+### 2. Create an in-memory data store for Meals
 The `init` command has created a fully running Kitura application, but one which has no application logic. In order to use it to store the data from the FoodTracker application, you need to create a datastore in the Kitura application for the Meal data from the FoodTracker iOS application. This tutorial uses a simple in-memory dictionary to store exactly the same Meal types that are used in the FoodTracker application.
 
 1. Copy the Meal.swift file from the FoodTracker app to the Server
@@ -85,7 +85,7 @@ The `init` command has created a fully running Kitura application, but one which
    ```
 3. Add the Meal.swift file into the FoodServer project  
    1. Select the yellow Sources > Application folder in the left hand explorer menu  
-   2. Click right mouse and select Add Files to "FoodServer"... 
+   2. Click right mouse and select Add Files to "FoodServer"...
    3. Single left click the Meal.swift file found in FoodTrackerBackend > iOS > FoodTracker > FoodTracker
    4. Select the Options button, Scroll down about halfway through the "Add to targets" and tick the "Application"
    5. Untick any other options in "add to targets" and click Add
@@ -93,7 +93,7 @@ The `init` command has created a fully running Kitura application, but one which
    1. Open the Sources > Application > Application.swift file
    2. Add a "mealstore" inside the app class,  by inserting the following code:
       ```
-      private var mealStore: [String: Meal] = [:] 
+      private var mealStore: [String: Meal] = [:]
       ```
       On the line below `let cloudEnv = CloudEnv()`
 
@@ -113,7 +113,7 @@ router.post("/meals", handler: storeHandler)
 Add the following code as a function in the App class, beneath the postInit() function:  
 ```swift
     func storeHandler(meal: Meal, completion: (Meal?, RequestError?) -> Void ) -> Void {
-        mealStore[meal.name] = meal 
+        mealStore[meal.name] = meal
         completion(mealStore[meal.name], nil)
     }
 ```    
@@ -152,7 +152,7 @@ There are many utilities for testing REST APIs, such as [Postman](https://www.ge
 ```
 curl -X GET \
   http://localhost:8080/meals \
-  -H 'content-type: application/json' 
+  -H 'content-type: application/json'
 ```
 If the GET endpoint is working correctly, this should return an array of JSON data representing the stored Meals. As no data is yet stored, this should return an empty array, ie:  
 ```
@@ -173,14 +173,14 @@ curl -X POST \
 If the POST endpoint is working correctly, this should return the same JSON that was passed in, eg:  
 ```
 {"name":"test","photo":"0e430e3a","rating":1}
-``` 
+```
 
 5. Test the GET REST API is returning the stored data correctly  
 In order to check that the data is being stored correctly, re-run the GET check:  
 ```
 curl -X GET \
   http://localhost:8080/meals \
-  -H 'content-type: application/json' 
+  -H 'content-type: application/json'
 ```
 This should now return a single entry array containing the Meal that was stored by the POST request, eg:  
 ```
@@ -203,7 +203,7 @@ cd ~/FoodTrackerBackend
 kitura kit
 ```
 3. Copy the KituraKit into the FoodTracker app  
-``` 
+```
 unzip ~/FoodTrackerBackend/KituraKit.zip -d ~/FoodTrackerBackend
 ```  
 4. Create a Podfile in the FoodTracker iOS application directory:
@@ -212,7 +212,7 @@ cd ~/FoodTrackerBackend/iOS/FoodTracker/
 pod init
 ```
 5. Edit the Podfile to use install KituraKit:
-   1. Open the Podfile for editing 
+   1. Open the Podfile for editing
    ```
    open Podfile
    ```
@@ -233,7 +233,7 @@ pod install
 cd ~/FoodTrackerBackend/iOS/FoodTracker/
 open FoodTracker.xcworkspace
 ```
-  
+
 KituraKit should now be installed, and you should be able to build and run the FoodTracker project as before. Note that from now on you should open the Xcode workspace ('FoodTracker.xcworkspace') not project.
 
 ### Update FoodTracker to call the Kitura FoodServer
@@ -268,7 +268,7 @@ Now that KituraKit is installed into the FoodTracker application, it needs to be
     ```
 
 ### Update the FoodTracker app to allow interaction with a Server
-The final step is to update the FoodTracker application to allow loads from a server `FoodTracker > Info.plist` file to allow loads from a server.
+The final step is to update the FoodTracker application to allow loads from a server.
 
 1. Update the `FoodTracker > Info.plist` file to allow loads from a server:  
 **Note:** This step has been completed already:  
@@ -293,10 +293,10 @@ The final step is to update the FoodTracker application to allow loads from a se
 ```
 curl -X GET \
   http://localhost:8080/meals \
-  -H 'content-type: application/json' 
+  -H 'content-type: application/json'
 ```
 This should now return an array containing the Meals that was stored by the POST request. As this contains the full images stored in the Meal objects, this will involve several screens of data!
-    
+
 ### Congratulations, you have successfully build a Kitura Backend for an iOS app!
 
 ## Next Steps
@@ -310,6 +310,6 @@ Now that the Meals from the FoodTracker app are being stored on a server, it bec
 The following steps describe how to start to [Build a FoodTracker Web Application](AddWebApplication.md)
 
 ### Deploy and host the Kitura FoodServer in the Cloud
-In order for a real iOS app to connect to a Kitura Server, it needs to be hosted at a public URL that the iOS app can reach. 
+In order for a real iOS app to connect to a Kitura Server, it needs to be hosted at a public URL that the iOS app can reach.
 
-Kitura is deployable to any cloud, but the project created with `kitura init` provides additonal files so that it is pre-configured for clouds that support any of Cloud Foundry, Docker or Kubernetes. The follow contains the steps to take the Kitura FoodServer and [Deploy to the IBM Cloud using Cloud Foundry](DeployToCloud.md) 
+Kitura is deployable to any cloud, but the project created with `kitura init` provides additonal files so that it is pre-configured for clouds that support any of Cloud Foundry, Docker or Kubernetes. The follow contains the steps to take the Kitura FoodServer and [Deploy to the IBM Cloud using Cloud Foundry](DeployToCloud.md)
