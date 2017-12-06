@@ -196,23 +196,13 @@ KituraKit is designed to be used both in iOS apps and in server projects. Curren
 
 1. If the "FoodTracker" Xcode project it is open, close it.
 Installing the KituraKit bundle as a CocoaPod will edit the project and create a workspace, so it is best if the project is closed.
-2. Download the KituraKit for iOS bundle  
-KituraKit for iOS can be downloaded from the [KituraKit Releases](https://github.com/IBM-Swift/KituraKit/releases) page by choosing the latest "KituraKit.zip" file, but the easiest way it to use the Kitura command line.
-```
-cd ~/FoodTrackerBackend
-kitura kit
-```
-3. Copy the KituraKit into the FoodTracker app  
-```
-unzip ~/FoodTrackerBackend/KituraKit.zip -d ~/FoodTrackerBackend
-```  
-4. Create a Podfile in the FoodTracker iOS application directory:
+2. Create a Podfile in the FoodTracker iOS application directory:
 ```
 cd ~/FoodTrackerBackend/iOS/FoodTracker/
 pod init
 ```
-5. Edit the Podfile to use install KituraKit:
-   1. Open the Podfile for editing
+3. Edit the Podfile to use KituraKit:
+   1. Open the Podfile for editing 
    ```
    open Podfile
    ```
@@ -221,14 +211,14 @@ pod init
    3. Under the "# Pods for FoodTracker" line add:
    ```
    # Pods for FoodTracker
-   pod 'KituraKit', :path => ‘~/FoodTrackerBackend/KituraKit’
+   pod 'KituraKit', :git => 'https://github.com/IBM-Swift/KituraKit.git', :branch => 'pod'
    ```
    4. Save and close the file
-6. Install KituraKit:
+4. Install KituraKit:
 ```
 pod install
 ```
-7. Open the Xcode workspace (not project!)
+5. Open the Xcode workspace (not project!)
 ```
 cd ~/FoodTrackerBackend/iOS/FoodTracker/
 open FoodTracker.xcworkspace
