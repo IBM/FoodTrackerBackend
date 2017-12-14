@@ -16,6 +16,9 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
     @IBOutlet weak var photoImageView: UIImageView!
     @IBOutlet weak var ratingControl: RatingControl!
     @IBOutlet weak var saveButton: UIBarButtonItem!
+    @IBOutlet weak var caloriesSlider: UISlider!
+    @IBOutlet weak var caloriesLabel: UILabel!
+    
     
     /*
          This value is either passed by `MealTableViewController` in `prepare(for:sender:)`
@@ -34,6 +37,8 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
             navigationItem.title = meal.name
             nameTextField.text = meal.name
             photoImageView.image = UIImage(data: meal.photo)
+            caloriesSlider.value = Float(meal.calories)
+            caloriesLabel.text = "\(meal.calories)"
             ratingControl.rating = meal.rating
         }
         
@@ -109,10 +114,11 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         
         let name = nameTextField.text ?? ""
         let photo = photoImageView.image
+        let calories = Int(caloriesSlider.value)
         let rating = ratingControl.rating
         
         // Set the meal to be passed to MealTableViewController after the unwind segue.
-        meal = Meal(name: name, photo: UIImageJPEGRepresentation(photo!, 1)!, rating: rating)
+        meal = Meal(name: name, photo: UIImageJPEGRepresentation(photo!, 1)!, calories: calories, rating: rating)
     }
     
     //MARK: Actions
@@ -130,6 +136,11 @@ class MealViewController: UIViewController, UITextFieldDelegate, UIImagePickerCo
         // Make sure ViewController is notified when the user picks an image.
         imagePickerController.delegate = self
         present(imagePickerController, animated: true, completion: nil)
+    }
+    
+    @IBAction func moveCaloriesSlider(_ sender: UISlider) {
+        var currentValue = Int(sender.value)
+        caloriesLabel.text = "\(currentValue)"
     }
     
     //MARK: Private Methods

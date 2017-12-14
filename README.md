@@ -86,9 +86,8 @@ The `init` command has created a fully running Kitura application, but one which
 3. Add the Meal.swift file into the FoodServer project  
    1. Select the yellow Sources > Application folder in the left hand explorer menu  
    2. Click right mouse and select Add Files to "FoodServer"...
-   3. Single left click the Meal.swift file found in FoodTrackerBackend > iOS > FoodTracker > FoodTracker
-   4. Select the Options button, Scroll down about halfway through the "Add to targets" and tick the "Application"
-   5. Untick any other options in "add to targets" and click Add
+   3. Find the Meal.swift file found in FoodTrackerBackend > FoodServer > Sources > Application
+   4. Single right click it, then select the Options button. Scroll down about halfway through the "Add to targets" and tick "Application". Untick any other options in "add to targets" and click "Add".
 4. Add a dictionary to the Application.swift file to store the Meal types  
    1. Open the Sources > Application > Application.swift file
    2. Add a "mealstore" inside the app class,  by inserting the following code:
@@ -165,14 +164,15 @@ curl -X POST \
   http://localhost:8080/meals \
   -H 'content-type: application/json' \
   -d '{
-	"name": "test",
-	"photo": "0e430e3a",
-	"rating": 1
+    "name": "test",
+    "photo": "0e430e3a",
+    "rating": 1,
+    "calories": 200
 }'
 ```
 If the POST endpoint is working correctly, this should return the same JSON that was passed in, eg:  
 ```
-{"name":"test","photo":"0e430e3a","rating":1}
+{"name":"test","photo":"0e430e3a","rating":1,"calories":200}
 ```
 
 5. Test the GET REST API is returning the stored data correctly  
@@ -184,7 +184,7 @@ curl -X GET \
 ```
 This should now return a single entry array containing the Meal that was stored by the POST request, eg:  
 ```
-[{"name":"test","photo":"0e430e3a","rating":1}]
+[{"name":"test","photo":"0e430e3a","rating":1,"calories":200}]
 ```
 
 ## Connect FoodTracker to the Kitura FoodServer
