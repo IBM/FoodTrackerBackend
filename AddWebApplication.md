@@ -4,6 +4,11 @@ Now that there is a [FoodServer as a backend for the FoodTracker app](README.md)
 
 The steps below show how to start hosting a web application for the images in the Kitura server.
 
+### Pre-Requisites:
+This tutorial follows on from the FoodTracker Application and server created by following the [FoodTrackerBackend](https://github.com/IBM/FoodTrackerBackend) tutorial. If you have completed the FoodTracker Backend there are no further pre-requisites.
+
+If you have not completed the [FoodTrackerBackend](https://github.com/IBM/FoodTrackerBackend) tutorial go to the [CompletedFoodTracker](https://github.com/IBM/FoodTrackerBackend/tree/CompletedFoodTracker) branch and follow the README instructions.
+
 ### Serve the Meals using Static File Serving
 One approach to making the Meals available through a web application is to store static HTML pages along with copies of the images on the local file system, and serve them using Kitura's StaticFileServer.
 

@@ -1,0 +1,9 @@
+.DS_Store
+/.build
+/.build-ubuntu
+/Packages
+/config.json
+/spec.json
+./config/localdev-config.json
+FoodServer.xcodeproj/
+Package.resolved

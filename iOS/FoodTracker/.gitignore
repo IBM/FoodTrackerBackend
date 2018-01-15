@@ -1,0 +1,12 @@
+.DS_Store
+/.build
+/.build-ubuntu
+/Packages
+/config.json
+/spec.json
+./config/localdev-config.json
+FoodTracker.xcodeproj/
+FoodTracker.xcworkspace/
+Podfile.lock
+Pods/
+Package.resolved
