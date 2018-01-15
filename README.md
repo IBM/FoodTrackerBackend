@@ -12,6 +12,15 @@
 
 This tutorial teaches how to create a [Kitura Swift backend](http://kitura.io) for the [FoodTracker iOS app tutorial](https://developer.apple.com/library/content/referencelibrary/GettingStarted/DevelopiOSAppsSwift/) from Apple. This project contains a version of the tutorial code that has been updated to use [Codable](https://developer.apple.com/documentation/swift/codable) rather than [NSCoder](https://developer.apple.com/documentation/foundation/nscoder).
 
+Upon completion of this tutorial there are several [next steps](#next-steps) you can take to add further functionality to the application:
+
+- [Adding a Database to the Kitura FoodServer with Swift-Kuery](AddDatabase.md)
+- [Add Support for Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md)
+- [Add a Web Application to the Kitura server](AddWebApplication.md)
+- [Deploy and host the Kitura FoodServer in the Cloud](DeployToCloud.md)
+- [View a sample Todo list application using Kitura](https://github.com/IBM-Swift/iOSSampleKituraKit)
+
+If you would like to jump straight to one of these next steps a completed version of this tutorial with instruction on starting the server and application is available on the [CompletedFoodTracker branch](https://github.com/IBM/FoodTrackerBackend/tree/CompletedFoodTracker).
 
 ## Pre-Requisites:
 **Note:** This workshop has been developed for Swift 4, Xcode 9.x and Kitura 2.x.
@@ -111,7 +120,7 @@ router.post("/meals", handler: storeHandler)
 2. Implement the storeHandler that receives a Meal, and returns the stored Meal  
 Add the following code as a function in the App class, beneath the postInit() function:  
 ```swift
-    func storeHandler(meal: Meal, completion: (Meal?, RequestError?) -> Void ) -> Void {
+    func storeHandler(meal: Meal, completion: (Meal?, RequestError?) -> Void ) {
         mealStore[meal.name] = meal
         completion(mealStore[meal.name], nil)
     }
@@ -127,7 +136,7 @@ Add the following into the `postInit()` function:
 4. Implement the loadHandler that returns the stored Meals as an array.      
 Add the following as another function in the App class:
 ```swift
-    func loadHandler(completion: ([Meal]?, RequestError?) -> Void ) -> Void {
+    func loadHandler(completion: ([Meal]?, RequestError?) -> Void ) {
 	    let meals: [Meal] = self.mealStore.map({ $0.value })
        completion(meals, nil)
     }
@@ -166,13 +175,12 @@ curl -X POST \
   -d '{
     "name": "test",
     "photo": "0e430e3a",
-    "rating": 1,
-    "calories": 200
+    "rating": 1
 }'
 ```
 If the POST endpoint is working correctly, this should return the same JSON that was passed in, eg:  
 ```
-{"name":"test","photo":"0e430e3a","rating":1,"calories":200}
+{"name":"test","photo":"0e430e3a","rating":1}
 ```
 
 5. Test the GET REST API is returning the stored data correctly  
@@ -184,7 +192,7 @@ curl -X GET \
 ```
 This should now return a single entry array containing the Meal that was stored by the POST request, eg:  
 ```
-[{"name":"test","photo":"0e430e3a","rating":1,"calories":200}]
+[{"name":"test","photo":"0e430e3a","rating":1}]
 ```
 
 ## Connect FoodTracker to the Kitura FoodServer
@@ -292,14 +300,21 @@ This should now return an array containing the Meals that was stored by the POST
 ## Next Steps
 If you have sufficient time, the following tasks can be completed to update your application.
 
+### Adding a Database to the Kitura FoodServer with Swift-Kuery
+The current implementation of the Kitura FoodServer is storing the meals in a local dictionary on the server. This meals that if the server is restated all the saved data will be lost. These following tutorial demonstrates how to add a PostgreSQL database to the FoodServer using [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) and [Swift-Kuery-PostgreSQL](https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL) to [add data persistence to the server](AddDatabase.md).
+
 ### Add Support for Retrieving and Deleting Meals from the FoodServer
-The current implementation of the Kitura FoodServer has support for retrieving all of the stored Meals using a `GET` request on `/meals`, but the FoodTracker app is currently only saving the Meals to the FoodServer. The following contains the steps to add [Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md)
+The current implementation of the Kitura FoodServer has support for retrieving all of the stored Meals using a `GET` request on `/meals`, but the FoodTracker app is currently only saving the Meals to the FoodServer. The following contains the steps to add [Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md).
 
 ### Add a Web Application to the Kitura server
 Now that the Meals from the FoodTracker app are being stored on a server, it becomes possible to start building a web application that also provides users with access to the stored Meal data.
-The following steps describe how to start to [Build a FoodTracker Web Application](AddWebApplication.md)
+The following steps describe how to start to [Build a FoodTracker Web Application](AddWebApplication.md).
 
 ### Deploy and host the Kitura FoodServer in the Cloud
 In order for a real iOS app to connect to a Kitura Server, it needs to be hosted at a public URL that the iOS app can reach.
 
-Kitura is deployable to any cloud, but the project created with `kitura init` provides additonal files so that it is pre-configured for clouds that support any of Cloud Foundry, Docker or Kubernetes. The follow contains the steps to take the Kitura FoodServer and [Deploy to the IBM Cloud using Cloud Foundry](DeployToCloud.md)
+Kitura is deployable to any cloud, but the project created with `kitura init` provides additonal files so that it is pre-configured for clouds that support any of Cloud Foundry, Docker or Kubernetes. The follow contains the steps to take the Kitura FoodServer and [Deploy to the IBM Cloud using Cloud Foundry](DeployToCloud.md).
+
+### View a sample Todo list application using Kitura
+This tutorial takes you through the basics of creating a Kitura server. To see a completed Todo list application with demonstrations of all HTTP requests go to [iOSSampleKituraKit](https://github.com/IBM-Swift/iOSSampleKituraKit)
+

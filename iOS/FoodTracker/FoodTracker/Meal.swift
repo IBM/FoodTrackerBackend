@@ -14,20 +14,14 @@ struct Meal: Codable {
     
     var name: String
     var photo: Data
-    var calories: Int
     var rating: Int
     
     //MARK: Initialization
     
-    init?(name: String, photo: Data, calories: Int, rating: Int) {
+    init?(name: String, photo: Data, rating: Int) {
         
         // The name must not be empty
         guard !name.isEmpty else {
-            return nil
-        }
-        
-        //The calories must be positive
-        guard (calories >= 0) else {
             return nil
         }
         
@@ -44,7 +38,6 @@ struct Meal: Codable {
         // Initialize stored properties.
         self.name = name
         self.photo = photo
-        self.calories = calories
         self.rating = rating
         
     }

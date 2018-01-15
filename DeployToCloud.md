@@ -1,6 +1,12 @@
 # Deploying the Kitura FoodServer to IBM Cloud
 
 ### Pre-Requisites:
+
+**Creating the Food Tracker**  
+This tutorial follows on from the FoodTracker Application and server created by following the [FoodTrackerBackend](https://github.com/IBM/FoodTrackerBackend) tutorial.
+
+If you have not completed the [FoodTrackerBackend](https://github.com/IBM/FoodTrackerBackend) tutorial go to the [CompletedFoodTracker](https://github.com/IBM/FoodTrackerBackend/tree/CompletedFoodTracker) branch and follow the README instructions.
+
 **Create a free IBM Cloud Account**  
 Go to the following URL, fill out the form and press "Create Account":  
 https://console.bluemix.net/registration?cm_sp=dw-bluemix-_-swift-_-devcenter
