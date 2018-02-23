@@ -210,7 +210,7 @@ cd ~/FoodTrackerBackend/iOS/FoodTracker/
 pod init
 ```
 3. Edit the Podfile to use KituraKit:
-   1. Open the Podfile for editing 
+   1. Open the Podfile for editing
    ```
    open Podfile
    ```
@@ -297,11 +297,185 @@ This should now return an array containing the Meals that was stored by the POST
 
 ### Congratulations, you have successfully build a Kitura Backend for an iOS app!
 
+## Connecting A PostgreSQL Database
+### Creating a PostgreSQL Database
+ We created a server and connected it to the iOS application. This means created meals are posted to the server and a user can then view these meals on [localhost:8080/meals](http://localhost:8080/meals). Since the meals are stored on the server, if the server is restarted the meal data is lost. To solve this problem, we will start by creating a PostgreSQL database where the meals will be stored.
+
+1. Install PostgreSQL:
+```
+brew install postgresql
+brew services start postgresql
+```
+You should receive a message that either PostgreSQL has been started or the service is already running. This installation should have installed two applications we need, namely `createdb` and `psql`, which will be used as clients to your locally running PostgreSQL.
+
+2. Create a database called FoodDatabase to store the data:
+```
+createdb FoodDatabase
+```
+
+### Adding Swift-Kuery-ORM dependencies to your server
+[Swift-Kuery-ORM](https://github.com/IBM-Swift/Swift-Kuery-ORM) is an ORM that works alongside a specific database library, such as [Swift-Kuery-PostgreSQL](https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL), to allow a user to easily interact with database in Swift. These two libraries are added to our `Package.swift` file, so the server can access them.
+
+1. If the "FoodServer" Xcode project is open, close it. Installing Swift-Kuery-ORM and Swift-Kuery-PostgreSQL will modify the Xcode project.
+
+2. Open a new terminal window and go to your `Package.swift` file.
+```
+cd FoodTrackerBackend/FoodServer
+open Package.swift
+```
+3. Add the Swift-Kuery-ORM and Swift-Kuery-PostgreSQL packages.
+```swift
+.package(url: "https://github.com/IBM-Swift/Swift-Kuery-ORM.git", .upToNextMinor(from: "0.0.1")),
+.package(url: "https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL.git", .upToNextMinor(from: "1.1.0")),
+```
+below the line `.package(url:
+  "https://github.com/IBM-Swift/Health.git", from: "0.0.0"),`
+
+4. Change the target for Application to include SwiftKueryORM and SwiftKueryPostgreSQL after Health
+```swift
+.target(name: "Application", dependencies: [ "Kitura", "Configuration", "CloudEnvironment","SwiftMetrics","Health", "SwiftKueryORM", "SwiftKueryPostgreSQL"]),
+```
+
+### Generate your FoodServer Xcode project
+Now we have added the dependencies to our `Package.swift` file we can generate our FoodServer Xcode project to make editing the code easier. The FoodServer is a pure Swift project and so the following steps could also be achieved by editing the .swift files.
+
+1. Generate the server Xcode project:
+```
+swift package generate-xcodeproj
+open FoodServer.xcodeproj/
+```
+2. Click on the "FoodServer-Package" text on the top-left of the toolbar and select "Edit scheme" from the dropdown menu.
+3. In "Run" click on the "Executable" dropdown, select FoodServer and click Close.
+
+Now when you press play, Xcode will start your FoodTracker server listening on port 8080. You can see this by going to [http://localhost:8080/](http://localhost:8080/ ) which will show the default Kitura landing page.
+
+### Making Meal a Model
+To work with the ORM, the struct Meal needs to implement the Model.
+
+1. Open your `Sources > Application > Meal.swift` file
+2. Add SwiftKueryORM to the import statements:
+```swift
+import SwiftKueryORM
+```
+3. Make Meal implement Model, by replacing:
+```swift
+struct Meal: Codable {
+```
+with
+```swift
+struct Meal: Model {
+```
+
+### Deleting the server mealStore
+Since we will be storing the meal data in a database we no longer need a local meal store on the server.
+
+1. Open your `Sources > Application > Application.swift` file
+
+2. Delete the mealStore initialiser:
+```swift
+private var mealStore: [String: Meal] = [:]
+```
+
+3. Delete the mealStore references in `storeHandler`:
+```swift
+mealStore[meal.name] = meal
+completion(mealStore[meal.name], nil)
+```
+
+4. Delete the mealStore references in `loadHandler`:
+```swift
+let meals: [Meal] = self.mealStore.map({ $0.value })
+completion(meals, nil)
+```
+
+### Connecting to the PostgreSQL database
+We will now connect to our server to the PostgreSQL database. This will allow us to send and receive information from the database.
+
+1. Still in your `Application.swift` file, add SwiftKueryORM and SwiftKueryPostgreSQL to the import statements:
+```swift
+import SwiftKueryORM
+import SwiftKueryPostgreSQL
+```
+2. Set up a connection and create a table in the database by inserting:
+
+```swift
+let pool = PostgreSQLConnection.createPool(host: "localhost", port: 5432, options: [.databaseName("FoodDatabase")], poolOptions: ConnectionPoolOptions(initialCapacity: 10, maxCapacity: 50, timeout: 10000))
+Database.default = Database(pool)
+
+do {
+  try Meal.createTableSync()
+} catch {
+  print(error)
+}
+```
+below the line `router.get("/meals", handler: loadHandler)`
+
+**Note** We use a connection pool since we have concurrent requests.
+
+Before we start using the PostgreSQL Database, we need to create a table in the database. Add the following:
+
+2. Add the `@escaping` keyword to the completion closure in the `storeHandler`  signatures.
+```swift
+func storeHandler(meal: Meal, completion: @escaping (Meal?, RequestError?) -> Void ) {
+```
+
+3. Add the `@escaping` keyword to the completion closure in the `loadHandler`  signatures.
+```swift
+func loadHandler(completion: @escaping ([Meal]?, RequestError?) -> Void ) {
+```
+
+Allowing the completion closure to be escaping means the database queries can be asynchronous.
+
+## Using the PostgreSQL Database
+### Handling an HTTP POST request
+We are now going to save a meal in our `storeHandler`. This will mean that when our server receives an HTTP `POST` request, it will take the Meal instance received and save it to the database.
+
+1.  Inside the `storeHandler` function add the following line:
+```swift
+meal.save(completion)
+```
+2. Your completed `storeHandler` function should now look as follows:
+```swift
+func storeHandler(meal: Meal, completion: @escaping (Meal?, RequestError?) -> Void ) {
+      meal.save(completion)
+}
+```
+You can verify this by:
+
+Starting the FoodTracker application in Xcode.
+Creating a meal in the application.
+Go to your terminal.
+Accessing your database: psql FoodDatabase
+Viewing your meals table: SELECT name, rating FROM meals;
+This should produce a table with the name and the rating of your newly added meal.
+**NOTE** We do not print out the photo because it is too large
+
+
+Now when you create a meal in the application, the server will save it to the PostgreSQL database.
+
+### Handling an HTTP GET request
+We are going to get our meals in our `loadHandler` function. This will mean that when the server receives an HTTP `GET` request, it will get the meals from the database. This means the data the server returns to the client is taken from the database and will persist, even if the server is restarted.
+
+1.  Inside the `loadHander` function add the following line:
+```swift
+Meal.findAll(completion)
+```
+
+2. Your completed `loadHandler` function should now look as follows:
+```swift
+func loadHandler(completion: @escaping ([Meal]?, RequestError?) -> Void ) {
+      Meal.findAll(completion)
+}
+```
+
+Now when you perform a `GET` call to your server it will retrieve the meals from your database.
+You can verify this by going to [http://localhost:8080/meals](http://localhost:8080/meals), where you should see your meals.
+You can now restart your server and this data will persist, since it is stored within the database!
+
+### Congratulations, you have successfully built a Kitura backend and stored the data in a PostgreSQL database!
+
 ## Next Steps
 If you have sufficient time, the following tasks can be completed to update your application.
-
-### Adding a Database to the Kitura FoodServer with Swift-Kuery
-The current implementation of the Kitura FoodServer is storing the meals in a local dictionary on the server. This meals that if the server is restated all the saved data will be lost. These following tutorial demonstrates how to add a PostgreSQL database to the FoodServer using [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) and [Swift-Kuery-PostgreSQL](https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL) to [add data persistence to the server](AddDatabase.md).
 
 ### Add Support for Retrieving and Deleting Meals from the FoodServer
 The current implementation of the Kitura FoodServer has support for retrieving all of the stored Meals using a `GET` request on `/meals`, but the FoodTracker app is currently only saving the Meals to the FoodServer. The following contains the steps to add [Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md).
@@ -317,4 +491,3 @@ Kitura is deployable to any cloud, but the project created with `kitura init` pr
 
 ### View a sample Todo list application using Kitura
 This tutorial takes you through the basics of creating a Kitura server. To see a completed Todo list application with demonstrations of all HTTP requests go to [iOSSampleKituraKit](https://github.com/IBM-Swift/iOSSampleKituraKit)
-
