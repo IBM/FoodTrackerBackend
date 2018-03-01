@@ -352,22 +352,19 @@ Now when you press play, Xcode will start your FoodTracker server listening on p
 ### Making Meal a Model
 To work with the ORM, the struct Meal needs to implement the Model.
 
-1. Open your `Sources > Application > Meal.swift` file
-2. Add SwiftKueryORM to the import statements:
+1. Open your `Sources > Application > Application.swift` file
+2. Add two libraries to the import statements:
 ```swift
 import SwiftKueryORM
+import SwiftKueryPostgreSQL
 ```
-3. Make Meal implement Model, by replacing:
+3. Below the line that reads `public let health = Health()`, extend `Meal` to conform to `Model` like so: 
 ```swift
-struct Meal: Codable {
-```
-with
-```swift
-struct Meal: Model {
+extension Meal: Model { }
 ```
 
 ### Deleting the server mealStore
-Since we will be storing the meal data in a database we no longer need a local meal store on the server.
+Since we will be storing the meal data in a database, we no longer need a local meal store on the server.
 
 1. Open your `Sources > Application > Application.swift` file
 
@@ -391,26 +388,33 @@ completion(meals, nil)
 ### Connecting to the PostgreSQL database
 We will now connect to our server to the PostgreSQL database. This will allow us to send and receive information from the database.
 
-1. Still in your `Application.swift` file, add SwiftKueryORM and SwiftKueryPostgreSQL to the import statements:
-```swift
-import SwiftKueryORM
-import SwiftKueryPostgreSQL
-```
-2. Set up a connection and create a table in the database by inserting:
+1. In the same `Application.swift` file, go underneath your extension of `Meal` and add a new class:
 
 ```swift
-let pool = PostgreSQLConnection.createPool(host: "localhost", port: 5432, options: [.databaseName("FoodDatabase")], poolOptions: ConnectionPoolOptions(initialCapacity: 10, maxCapacity: 50, timeout: 10000))
-Database.default = Database(pool)
+class Persistence {
 
-do {
-  try Meal.createTableSync()
-} catch {
-  print(error)
 }
 ```
-below the line `router.get("/meals", handler: loadHandler)`
+2. Inside this class, create a static function that will set up a connection pool and assign it to a default database:
 
+```swift
+static func setUp() {
+    let pool = PostgreSQLConnection.createPool(host: "localhost", port: 5432, options: [.databaseName("FoodDatabase")], poolOptions: ConnectionPoolOptions(initialCapacity: 10, maxCapacity: 50, timeout: 10000))
+    Database.default = Database(pool)
+}
+```
 **Note** We use a connection pool since we have concurrent requests.
+
+3. Go to the `postInit` function below the line `router.get("/meals", handler: loadHandler)` and call your setup function, and create a table sync for your `Meal` object:
+
+```swift
+Persistence.setUp()
+do {
+    try Meal.createTableSync()
+} catch let error {
+    print(error)
+}
+```
 
 Before we start using the PostgreSQL Database, we need to create a table in the database. Add the following:
 
