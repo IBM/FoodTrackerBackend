@@ -14,7 +14,7 @@ This tutorial teaches how to create a [Kitura Swift backend](http://kitura.io) f
 
 Upon completion of this tutorial there are several [next steps](#next-steps) you can take to add further functionality to the application:
 
-- [Adding a Database to the Kitura FoodServer with Swift-Kuery](AddDatabase.md)
+- [Add a Website Frontend using the Stencil Template Engine](StencilFrontend.md)
 - [Add Support for Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md)
 - [Add a Web Application to the Kitura server](AddWebApplication.md)
 - [Deploy and host the Kitura FoodServer in the Cloud](DeployToCloud.md)
@@ -480,6 +480,9 @@ You can now restart your server and this data will persist, since it is stored w
 
 ## Next Steps
 If you have sufficient time, the following tasks can be completed to update your application.
+
+### Add a Website Frontend using the Stencil Template Engine
+The current implementation of the Kitura FoodServer returns a JSON array of the meals. To create a website, you would want to use html to structure the page. The following contains steps to embed the meal data into html and [add a Website Frontend using the Stencil Template Engine](StencilFrontend.md)
 
 ### Add Support for Retrieving and Deleting Meals from the FoodServer
 The current implementation of the Kitura FoodServer has support for retrieving all of the stored Meals using a `GET` request on `/meals`, but the FoodTracker app is currently only saving the Meals to the FoodServer. The following contains the steps to add [Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md).
