@@ -33,12 +33,13 @@ cd ~/FoodTrackerBackend/FoodServer
 mkdir Views
 cd Views
 ```
-3. Create a `FoodTemplate.stencil` file.
-We will use terminal commands for file creation but you can use a text editor of your choice.
+3. Create a `FoodTemplate.stencil` file, then open it with any text editor:
 ```
-cat > FoodTemplate.stencil
+touch FoodTemplate.stencil
+open -a Xcode.app FoodTemplate.stencil
 ```
-**Note:** You can exit `cat` using `CTRL+D`
+
+**NB**: You can use any text editor to open the `.stencil` file.
 
 4. Add the following Stencil template code to display the meals:
 
@@ -50,7 +51,7 @@ There are {{ meals.count }} meals. <br />
 {% endfor %}
 </html>
 ```
-5. Save the file and exit your text editor. For `cat` use the shortcut:  `CTRL+D`
+5. Save the file and exit your text editor.
 
 When the above code is rendered, it will display the total number of meals in your meal store, it will then loop through the meal store displaying each meal name and rating. For more details about Stencil templates see the [Stencil User Guide](http://stencil.fuller.li/en/latest/).
 
@@ -69,7 +70,7 @@ open Package.swift
 ```
 3. Change the target for Application to include "KituraStencil":
 ```swift
-.target(name: "Application", dependencies: [ "Kitura", "Configuration", "CloudEnvironment", "SwiftMetrics", "Health", "KituraStencil"]),
+.target(name: "Application", dependencies: [ "Kitura", "CloudEnvironment", "SwiftMetrics", "Health", "SwiftKueryORM", "SwiftKueryPostgreSQL", "KituraStencil"]),
 ```
 4. Regenerate your FoodServer Xcode project:
 ```
@@ -103,30 +104,48 @@ router.get("/foodtracker") { request, response, next in
 ```
 2. Build a JSON string description of the FoodTracker meal store.
 Add the following code inside your “/foodtracker" route above `next()`:
+
 ```swift
-let meals: [Meal] = self.mealStore.map({ $0.value })
-var allMeals : [String: [[String:Any]]] = ["meals" : []]
-for meal in meals {
-    allMeals["meals"]?.append(["name": meal.name, "rating": meal.rating])
+Meal.findAll { (result: [Meal]?, error: RequestError?) in
+    guard let meals = result else {
+        return
+    }
+    var allMeals: [String: [[String:Any]]] = ["meals" :[]]
+    for meal in meals {
+        allMeals["meals"]?.append(["name": meal.name, "rating": meal.rating])
+    }
 }
 ```
 3. Render the template and add it to your `response`.
 Add the following line above `next()`:
 ```swift
-try response.render("FoodTemplate.stencil", context: allMeals)
+do {
+    try response.render("FoodTemplate.stencil", context: allMeals)
+} catch let error {
+    response.send(json: ["Error": error.localizedDescription])
+}
 ```
 This will render the `FoodTemplate.stencil` file using `allMeals` to embed variables from the code.
 
 4. Your completed "/foodtracker" route should now look as follows:
+
 ```swift
 router.get("/foodtracker") { request, response, next in
-    let meals: [Meal] = self.mealStore.map({ $0.value })
-    var allMeals : [String: [[String:Any]]] = ["meals" : []]
-    for meal in meals {
-        allMeals["meals"]?.append(["name": meal.name, "rating": meal.rating])
+    Meal.findAll { (result: [Meal]?, error: RequestError?) in
+        guard let meals = result else {
+            return
+        }
+        var allMeals: [String: [[String:Any]]] = ["meals" :[]]
+        for meal in meals {
+            allMeals["meals"]?.append(["name": meal.name, "rating": meal.rating])
+        }
+        do {
+            try response.render("FoodTemplate.stencil", context: allMeals)
+        } catch let error {
+            response.send(json: ["Error": error.localizedDescription])
+        }
+        next()
     }
-    try response.render("FoodTemplate.stencil", context: allMeals)
-    next()
 }
 ```
 We can test this route by running the FoodTracker application and the FoodServer. Add a meal in the app and then go to [http://localhost:8080/foodtracker](http://localhost:8080/foodtracker). This will now display a line saying how many meals are present in the app and a list of the meal names and ratings.
@@ -143,26 +162,25 @@ mkdir public
 The default location for a static file server to serve files from is the ./public directory so we will create this directory on our server to save our users' pictures in.
 
 2. Open your `Sources > Application > Application.swift` file.
-3. Set up the file handler to write to the web hosting directory by adding the following under the `mealStore` declaration:
+3. Set up the file handler to write to the web hosting directory by adding the following under the `cloudEnv` declaration:
 ```swift
 private var fileManager = FileManager.default
 private var rootPath = StaticFileServer().absoluteRootPath
 ```
 4. Save the pictures received by the server.
-Add the following code to your `storehandler` function beneath `mealStore[meal.name] = meal`:
+Add the following code to the beginning of your `storeHandler`:
 ```swift
 let path = "\(self.rootPath)/\(meal.name).jpg"
 fileManager.createFile(atPath: path, contents: meal.photo)
 ```
 This will create a file with the name of your meal and a .jpg extension inside the public directory of your server. If the file already exists it will overwrite it with a new picture. You can test this by re-running the FoodServer with your changes and adding a meal - the photo should appear in the "public" directory you just created.
 
-5. Your `storehandler` function should now look as follows:
+5. Your `storeHandler` function should now look as follows:
 ```swift
 func storeHandler(meal: Meal, completion: (Meal?, RequestError?) -> Void ) {
-    mealStore[meal.name] = meal
     let path = "\(self.rootPath)/\(meal.name).jpg"
     fileManager.createFile(atPath: path, contents: meal.photo)
-    completion(mealStore[meal.name], nil)
+    meal.save(completion)
 }
 ```
 
@@ -177,7 +195,7 @@ router.get("/images", middleware: StaticFileServer())
 2. Open your "FoodTemplate.stencil" file:
 ```
 cd ~/FoodTrackerBackend/FoodServer/Views
-open FoodTemplate.stencil
+open -a Xcode.app FoodTemplate.stencil
 ```
 3. Add the following line in your `for` loop below the line  `- {{ meal.name }} with rating {{ meal.rating }}. <br />`
 ```
@@ -199,7 +217,7 @@ cd ~/FoodTrackerBackend/FoodServer/Views
 ```
 2. Open your `FoodTemplate.stencil` file:
 ```
-open FoodTemplate.stencil
+open -a Xcode.app FoodTemplate.stencil
 ```
 3. Add the following code below `{% endfor %}`:
 ```
@@ -269,9 +287,11 @@ else {
 
 Insert the following code after the else block:
 ```swift
-self.mealStore[newMeal.name] = newMeal
 let path = "\(self.rootPath)/\(newMeal.name).jpg"
 self.fileManager.createFile(atPath: path, contents: newMeal.photo)
+newMeal.save { (meal: Meal?, error: RequestError?) in
+    next()
+}
 ```
 For simplicity we are only accepting `.jpg` files from the web page.
 
@@ -302,10 +322,11 @@ router.post("/foodtracker") { request, response, next in
         next()
         return
     }
-    self.mealStore[newMeal.name] = newMeal
-    let path = "\(self.rootPath)/\(newMeal.name).jpg"
-    self.fileManager.createFile(atPath: path, contents: newMeal.photo)
-    next()
+	 let path = "\(self.rootPath)/\(newMeal.name).jpg"
+	 self.fileManager.createFile(atPath: path, contents: newMeal.photo)
+	 newMeal.save { (meal: Meal?, error: RequestError?) in
+	     next()
+	 }
 }
 ```
 
@@ -313,7 +334,7 @@ Restart your server to add your new changes. When you add a new meal at [http://
 
 ## Adding HTML and CSS
 
-We have provided some basic html and css in a file called `Example.stencil`. To improve the presentation of the webpage, We will replace serve this template instead of `FoodTemplate.stencil`.
+We have provided some basic html and css in a file called `Example.stencil`. To improve the presentation of the webpage, we will serve this template instead of `FoodTemplate.stencil`.
 
 ### Move `Example.Stencil` to the Views folder
 1. Open your terminal window.
@@ -338,4 +359,4 @@ try response.render("Example.stencil", context: allMeals)
 
 Now view your webpage at [http://localhost:8080/foodtracker](http://localhost:8080/foodtracker). Your front end will have CSS styling to create a complete food tracker website!
 
-Any questions or comments? Please join the Kitura community on [Slack](http://swift-at-ibm-slack.mybluemix.net/)!
+Any questions or comments? Please join the Kitura community on [Slack](http://slack.kitura.io)!

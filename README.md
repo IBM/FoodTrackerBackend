@@ -333,7 +333,7 @@ below the line `.package(url:
 
 4. Change the target for Application to include SwiftKueryORM and SwiftKueryPostgreSQL after Health
 ```swift
-.target(name: "Application", dependencies: [ "Kitura", "Configuration", "CloudEnvironment","SwiftMetrics","Health", "SwiftKueryORM", "SwiftKueryPostgreSQL"]),
+.target(name: "Application", dependencies: [ "Kitura","CloudEnvironment","SwiftMetrics","Health", "SwiftKueryORM", "SwiftKueryPostgreSQL"]),
 ```
 
 ### Generate your FoodServer Xcode project
