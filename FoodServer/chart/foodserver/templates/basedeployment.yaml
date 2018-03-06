@@ -1,11 +1,12 @@
+{{ if .Values.base.enabled }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: "{{  .Chart.Name }}-deployment"
+  name: "{{  .Chart.Name }}-basedeployment"
   labels:
     chart: '{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}'
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.base.replicaCount }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -16,13 +17,11 @@ spec:
     metadata:
       labels:
         app: "{{  .Chart.Name }}-selector"
-        version: "current"
+        version: "base"
     spec:
-      imagePullSecrets:
-      - name: "{{ .Values.image.pullSecret }}"
       containers:
       - name: "{{  .Chart.Name  }}"
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.base.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         livenessProbe:
           httpGet:
@@ -30,8 +29,6 @@ spec:
             port: {{ .Values.service.servicePort }}
           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds}}
           periodSeconds: {{ .Values.livenessProbe.periodSeconds}}
-        ports:
-        - containerPort: {{ .Values.service.servicePort}}
         resources:
           requests:
             cpu: "{{ .Values.image.resources.requests.cpu }}"
@@ -39,3 +36,4 @@ spec:
         env:
           - name: PORT
             value : "{{ .Values.service.servicePort }}"
+{{ end }}

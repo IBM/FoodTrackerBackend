@@ -5,65 +5,130 @@
 cat build.properties
 
 echo "Check cluster availability"
-ip_addr=$(bx cs workers $PIPELINE_KUBERNETES_CLUSTER_NAME | grep normal | awk '{ print $2 }')
-if [ -z $ip_addr ]; then
+IP_ADDR=$(bx cs workers ${PIPELINE_KUBERNETES_CLUSTER_NAME} | grep normal | head -n 1 | awk '{ print $2 }')
+if [ -z $IP_ADDR ]; then
     echo "$PIPELINE_KUBERNETES_CLUSTER_NAME not created or workers not ready"
     exit 1
 fi
 
-echo "Check cluster target namespace"
-if ! kubectl get namespace $CLUSTER_NAMESPACE; then
-    echo "$CLUSTER_NAMESPACE cluster namespace does not exist, creating it"
-    kubectl create namespace $CLUSTER_NAMESPACE
+echo "Configuring cluster namespace"
+if kubectl get namespace ${CLUSTER_NAMESPACE}; then
+  echo -e "Namespace ${CLUSTER_NAMESPACE} found."
+else
+  kubectl create namespace ${CLUSTER_NAMESPACE}
+  echo -e "Namespace ${CLUSTER_NAMESPACE} created."
 fi
 
-echo "create ${IMAGE_PULL_SECRET_NAME} imagePullSecret if it does not exist"
-if ! kubectl get secret ${IMAGE_PULL_SECRET_NAME} --namespace $CLUSTER_NAMESPACE; then
-    echo "${IMAGE_PULL_SECRET_NAME} not found in $CLUSTER_NAMESPACE, creating it"
-    # for Container Registry, docker username is 'token' and email does not matter
-    kubectl --namespace $CLUSTER_NAMESPACE create secret docker-registry $IMAGE_PULL_SECRET_NAME --docker-server=$REGISTRY_HOST --docker-password=$IMAGE_REGISTRY_TOKEN --docker-username=token --docker-email=a@b.com
+echo -e "Configuring access to private image registry from namespace ${CLUSTER_NAMESPACE}"
+echo -e "Checking for presence of ${IMAGE_PULL_SECRET_NAME} imagePullSecret for this toolchain"
+if ! kubectl get secret ${IMAGE_PULL_SECRET_NAME} --namespace ${CLUSTER_NAMESPACE}; then
+  echo -e "${IMAGE_PULL_SECRET_NAME} not found in ${CLUSTER_NAMESPACE}, creating it"
+  # for Container Registry, docker username is 'token' and email does not matter
+  kubectl --namespace ${CLUSTER_NAMESPACE} create secret docker-registry ${IMAGE_PULL_SECRET_NAME} --docker-server=${REGISTRY_URL} --docker-password=${PIPELINE_BLUEMIX_API_KEY} --docker-username=iamapikey --docker-email=a@b.com
+else
+  echo -e "Namespace ${CLUSTER_NAMESPACE} already has an imagePullSecret for this toolchain."
 fi
 
-echo "enable default serviceaccount to use the pull secret"
-kubectl patch -n $CLUSTER_NAMESPACE serviceaccount/default -p '{"imagePullSecrets":[{"name":"'"$IMAGE_PULL_SECRET_NAME"'"}]}'
-echo "Namespace $CLUSTER_NAMESPACE is now authorized to pull from the private image registry"
-echo "default serviceAccount:"
-kubectl get serviceAccount default -o yaml
-
-# Check Helm/Tiller
-echo "CHECKING TILLER (Helm's server component)"
+echo "Configuring Tiller (Helm's server component)"
 helm init --upgrade
-while true; do
-    tiller_deployed=$(kubectl --namespace=kube-system get pods | grep tiller | grep Running | grep 1/1 )
-    if [[ "${tiller_deployed}" != "" ]]; then
-        echo "Tiller ready."
-        break;
-    fi
-    echo "Waiting for Tiller to be ready."
-    sleep 1
-done
+kubectl rollout status -w deployment/tiller-deploy --namespace=kube-system
 helm version
 
 echo "CHART_NAME: $CHART_NAME"
+
+echo "DEFINE RELEASE by prefixing image (app) name with namespace if not 'default' as Helm needs unique release names across namespaces"
+if [[ "${CLUSTER_NAMESPACE}" != "default" ]]; then
+  RELEASE_NAME="${CLUSTER_NAMESPACE}-${IMAGE_NAME}"
+else
+  RELEASE_NAME=${IMAGE_NAME}
+fi
 echo "RELEASE_NAME: $RELEASE_NAME"
 
 echo "CHECKING CHART (lint)"
 helm lint ${RELEASE_NAME} ./chart/${CHART_NAME}
 
-echo "DRY RUN DEPLOYING into: $PIPELINE_KUBERNETES_CLUSTER_NAME/$CLUSTER_NAMESPACE."
-helm upgrade ${RELEASE_NAME} ./chart/${CHART_NAME} --namespace $CLUSTER_NAMESPACE --install --debug --dry-run
+IMAGE_REPOSITORY=${REGISTRY_URL}/${REGISTRY_NAMESPACE}/${IMAGE_NAME}
 
-echo "DEPLOYING into: $PIPELINE_KUBERNETES_CLUSTER_NAME/$CLUSTER_NAMESPACE."
-helm upgrade ${RELEASE_NAME} ./chart/${CHART_NAME} --namespace $CLUSTER_NAMESPACE --install
+# Using 'upgrade --install" for rolling updates. Note that subsequent updates will occur in the same namespace the release is currently deployed in, ignoring the explicit--namespace argument".
+echo -e "Dry run into: ${PIPELINE_KUBERNETES_CLUSTER_NAME}/${CLUSTER_NAMESPACE}."
+helm upgrade --install --debug --dry-run ${RELEASE_NAME} ./chart/${CHART_NAME} --set image.repository=${IMAGE_REPOSITORY},image.tag=${BUILD_NUMBER},image.pullSecret=${IMAGE_PULL_SECRET_NAME} --namespace ${CLUSTER_NAMESPACE}
+
+echo -e "Deploying into: ${PIPELINE_KUBERNETES_CLUSTER_NAME}/${CLUSTER_NAMESPACE}."
+helm upgrade  --install ${RELEASE_NAME} ./chart/${CHART_NAME} --set image.repository=${IMAGE_REPOSITORY},image.tag=${BUILD_NUMBER},image.pullSecret=${IMAGE_PULL_SECRET_NAME} --namespace ${CLUSTER_NAMESPACE}
+
+echo -e "CHECKING deployment status of release ${RELEASE_NAME} with image tag: ${BUILD_NUMBER}"
+echo ""
+for ITERATION in {1..30}
+do
+  DATA=$( kubectl get pods --namespace ${CLUSTER_NAMESPACE} -a -l release=${RELEASE_NAME} -o json )
+  NOT_READY=$( echo $DATA | jq '.items[].status.containerStatuses[] | select(.image=="'"${IMAGE_REPOSITORY}:${BUILD_NUMBER}"'") | select(.ready==false) ' )
+  if [[ -z "$NOT_READY" ]]; then
+    echo -e "All pods are ready:"
+    echo $DATA | jq '.items[].status.containerStatuses[] | select(.image=="'"${IMAGE_REPOSITORY}:${BUILD_NUMBER}"'") | select(.ready==true) '
+    break # deployment succeeded
+  fi
+  REASON=$(echo $DATA | jq '.items[].status.containerStatuses[] | select(.image=="'"${IMAGE_REPOSITORY}:${BUILD_NUMBER}"'") | .state.waiting.reason')
+  echo -e "${ITERATION} : Deployment still pending..."
+  echo -e "NOT_READY:${NOT_READY}"
+  echo -e "REASON: ${REASON}"
+  if [[ ${REASON} == *ErrImagePull* ]] || [[ ${REASON} == *ImagePullBackOff* ]]; then
+    echo "Detected ErrImagePull or ImagePullBackOff failure. "
+    echo "Please check proper authenticating to from cluster to image registry (e.g. image pull secret)"
+    break; # no need to wait longer, error is fatal
+  elif [[ ${REASON} == *CrashLoopBackOff* ]]; then
+    echo "Detected CrashLoopBackOff failure. "
+    echo "Application is unable to start, check the application startup logs"
+    break; # no need to wait longer, error is fatal
+  fi
+  sleep 5
+done
+
+if [[ ! -z "$NOT_READY" ]]; then
+  echo ""
+  echo "=========================================================="
+  echo "DEPLOYMENT FAILED"
+  echo "Deployed Services:"
+  kubectl describe services ${RELEASE_NAME}-${CHART_NAME} --namespace ${CLUSTER_NAMESPACE}
+  echo ""
+  echo "Deployed Pods:"
+  kubectl describe pods --selector app=${CHART_NAME} --namespace ${CLUSTER_NAMESPACE}
+  echo ""
+  echo "Application Logs"
+  kubectl logs --selector app=${CHART_NAME} --namespace ${CLUSTER_NAMESPACE}
+  echo "=========================================================="
+  PREVIOUS_RELEASE=$( helm history ${RELEASE_NAME} | grep SUPERSEDED | sort -r -n | awk '{print $1}' | head -n 1 )
+  echo -e "Could rollback to previous release: ${PREVIOUS_RELEASE} using command:"
+  echo -e "helm rollback ${RELEASE_NAME} ${PREVIOUS_RELEASE}"
+  # helm rollback ${RELEASE_NAME} ${PREVIOUS_RELEASE}
+  # echo -e "History for release:${RELEASE_NAME}"
+  # helm history ${RELEASE_NAME}
+  # echo "Deployed Services:"
+  # kubectl describe services ${RELEASE_NAME}-${CHART_NAME} --namespace ${CLUSTER_NAMESPACE}
+  # echo ""
+  # echo "Deployed Pods:"
+  # kubectl describe pods --selector app=${CHART_NAME} --namespace ${CLUSTER_NAMESPACE}
+  exit 1
+fi
 
 echo ""
-echo "DEPLOYED SERVICE:"
-kubectl describe services ${CHART_NAME} --namespace $CLUSTER_NAMESPACE
+echo "=========================================================="
+echo "DEPLOYMENT SUCCEEDED"
+echo ""
+echo -e "Status for release:${RELEASE_NAME}"
+helm status ${RELEASE_NAME}
 
 echo ""
-echo "DEPLOYED PODS:"
-kubectl describe pods --selector app=${CHART_NAME}-selector --namespace $CLUSTER_NAMESPACE
+echo -e "History for release:${RELEASE_NAME}"
+helm history ${RELEASE_NAME}
 
-port=$(kubectl get services --namespace $CLUSTER_NAMESPACE | grep ${CHART_NAME} | sed 's/.*:\([0-9]*\).*/\1/g')
-echo ""
-echo "VIEW THE APPLICATION AT: http://$ip_addr:$port"
+# echo ""
+# echo "Deployed Services:"
+# kubectl describe services ${RELEASE_NAME}-${CHART_NAME} --namespace ${CLUSTER_NAMESPACE}
+# echo ""
+# echo "Deployed Pods:"
+# kubectl describe pods --selector app=${CHART_NAME} --namespace ${CLUSTER_NAMESPACE}
+
+echo "=========================================================="
+IP_ADDR=$(bx cs workers ${PIPELINE_KUBERNETES_CLUSTER_NAME} | grep normal | head -n 1 | awk '{ print $2 }')
+PORT=$(kubectl get services --namespace ${CLUSTER_NAMESPACE} | grep ${RELEASE_NAME} | sed 's/.*:\([0-9]*\).*/\1/g')
+echo -e "View the application at: http://${IP_ADDR}:${PORT}"

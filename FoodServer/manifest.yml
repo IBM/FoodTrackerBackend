@@ -4,6 +4,6 @@ applications:
   timeout: 180
   name: FoodServer
   buildpack: swift_buildpack
-  command: FoodServer
+  command: "'FoodServer'"
   memory: 128M
   random-route: true

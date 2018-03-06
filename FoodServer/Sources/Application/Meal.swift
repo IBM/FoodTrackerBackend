@@ -18,7 +18,7 @@ struct Meal: Codable {
     
     //MARK: Initialization
     
-    init?(name: String, photo: Data, calories: Int, rating: Int) {
+    init?(name: String, photo: Data, rating: Int) {
         
         // The name must not be empty
         guard !name.isEmpty else {

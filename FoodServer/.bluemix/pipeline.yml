@@ -10,9 +10,6 @@ stages:
   - name: Build
     type: builder
     artifact_dir: ''
-  - name: Post Build
-    type: builder
-    artifact_dir: ''
     build_type: shell
     script: |-
       #!/bin/bash

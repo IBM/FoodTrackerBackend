@@ -6,7 +6,7 @@
 
 <p align="center">
 <a href= "http://swift-at-ibm-slack.mybluemix.net/">
-    <img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg"  alt="Slack">
+<img src="http://swift-at-ibm-slack.mybluemix.net/badge.svg"  alt="Slack">
 </a>
 </p>
 
@@ -59,8 +59,8 @@ To test the application and server are working, add a meal inside the applicatio
 ## Next Steps
 From this completed Foodtracker, the following tasks can be completed to update your application.
 
-### Adding a Database to FoodTracker Server with Swift-Kuery
-The current implementation of the Kitura FoodServer is storing the meals in a local dictionary on the server. This meals that if the server is restated all the saved data will be lost. These following tutorial demonstrates how to add a PostgreSQL database to the FoodTracker server using [Swift-Kuery](https://github.com/IBM-Swift/Swift-Kuery) and [Swift-Kuery-PostgreSQL](https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL) to [add data persistence to the server](AddDatabase.md).
+### Add a Website Frontend using the Stencil Template Engine
+The current implementation of the Kitura FoodServer returns a JSON array of the meals. To create a website, you would want to use html to structure the page. The following contains steps to embed the meal data into html and [add a Website Frontend using the Stencil Template Engine](StencilFrontend.md)
 
 ### Add Support for Retrieving and Deleting Meals from the FoodServer
 The current implementation of the Kitura FoodServer has support for retrieving all of the stored Meals using a `GET` request on `/meals`, but the FoodTracker app is currently only saving the Meals to the FoodServer. The following contains the steps to add [Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md)

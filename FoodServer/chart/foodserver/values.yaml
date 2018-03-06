@@ -6,6 +6,7 @@ image:
   repository: registry.ng.bluemix.net/replace-me-namespace/foodserver
   tag: v1.0.0
   pullPolicy: Always
+  pullSecret: regsecret
   resources:
     requests:
       cpu: 200m
@@ -27,3 +28,12 @@ hpa:
     memory:
       targetAverageUtilization: 70
 services:
+base:
+  enabled: false
+  replicaCount: 1
+  image:
+    tag : v0.9.9
+  weight: 100
+istio:
+  enabled: false
+  weight: 100

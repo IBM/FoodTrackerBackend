@@ -1,5 +1,9 @@
 {{ if .Values.hpa.enabled }}
+{{ if and (eq .Capabilities.KubeVersion.Major "1") (ge .Capabilities.KubeVersion.Minor "8") }}
+apiVersion: autoscaling/v2beta1
+{{ else }}
 apiVersion: autoscaling/v2alpha1
+{{ end }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: "{{ .Chart.Name }}-hpa-policy"
