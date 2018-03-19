@@ -87,16 +87,17 @@ The `init` command has created a fully running Kitura application, but one which
    cd ~/FoodTrackerBackend
    cp ./iOS/FoodTracker/FoodTracker/Meal.swift ./FoodServer/Sources/Application
    ```
-2. Open the FoodServer project in Xcode  
+2. Regenerate the FoodServer Xcode project to link "Meal.swift".
    ```
-   cd ~/FoodTrackerBackend/FoodServer  
-   open FoodServer.xcodeproj
+   cd ~/FoodTrackerBackend/FoodServer
+   swift package generate-xcodeproj
    ```
-3. Add the Meal.swift file into the FoodServer project  
-   1. Select the yellow Sources > Application folder in the left hand explorer menu  
-   2. Click right mouse and select Add Files to "FoodServer"...
-   3. Find the Meal.swift file found in FoodTrackerBackend > FoodServer > Sources > Application
-   4. Single right click it, then select the Options button. Scroll down about halfway through the "Add to targets" and tick "Application". Untick any other options in "add to targets" and click "Add".
+3. Open the FoodServer project in Xcode
+```
+ open FoodServer.xcodeproj
+```
+**Note:** When you open xcode you may see the error "No such module 'Kitura'". This is an Xcode bug, it has found and linked Kitura so disregard the message.
+
 4. Add a dictionary to the Application.swift file to store the Meal types  
    1. Open the Sources > Application > Application.swift file
    2. Add a "mealstore" inside the app class,  by inserting the following code:
@@ -146,10 +147,9 @@ Add the following as another function in the App class:
 
 
 1. Run the server project in Xcode
-    1. Edit the scheme by clicking on the "FoodServer-Package" section on the top-left the toolbar and selecting "Edit scheme"
-    2. In "Run" click on the "Executable" dropdown, select FoodServer and click Close
-    3. Press the Run button or use the ⌘+R key shortcut.
-    4. Select "Allow incoming network connections" if you are prompted.
+    1. In the top left corner of Xcode you should a small terminal icon with the text "FoodServer-Package" next to it. Click this icon and then click "FoodServer" from the dropdown menu.
+    2. Press the Run button or use the ⌘+R key shortcut.
+    3. Select "Allow incoming network connections" if you are prompted.
 
 2. Check that some of the standard Kitura URLs are running:
     * Kitura Monitoring: http://localhost:8080/swiftmetrics-dash/
@@ -166,6 +166,8 @@ If the GET endpoint is working correctly, this should return an array of JSON da
 ```
 []
 ```
+Alternatively, you can go to [http://localhost:8080/meals](http://localhost:8080/meals) to view a GET request to your server.
+
 4.  Test the POST REST API is running correctly  
 In order to test the POST API, we make a similar call, but also sending in a JSON object that matches the Meal data:  
 ```
@@ -216,6 +218,9 @@ pod init
    ```
    2. Set a global platform of iOS 11 for your project  
    Uncomment `# platform :ios, '9.0'` and set the value to `11.0`
+   ```
+   platform :ios, '11.0'
+   ```
    3. Under the "# Pods for FoodTracker" line add:
    ```
    # Pods for FoodTracker
@@ -269,7 +274,7 @@ Now that KituraKit is installed into the FoodTracker application, it needs to be
 The final step is to update the FoodTracker application to allow loads from a server.
 
 1. Update the `FoodTracker > Info.plist` file to allow loads from a server:  
-**Note:** This step has been completed already:  
+**Note:** This step has been completed for you already:  
 ```
     <key>NSAppTransportSecurity</key>
 	<dict>
@@ -358,7 +363,7 @@ To work with the ORM, the struct Meal needs to implement the Model.
 import SwiftKueryORM
 import SwiftKueryPostgreSQL
 ```
-3. Below the line that reads `public let health = Health()`, extend `Meal` to conform to `Model` like so: 
+3. Below the line that reads `public let health = Health()`, extend `Meal` to conform to `Model` like so:
 ```swift
 extension Meal: Model { }
 ```
