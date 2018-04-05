@@ -24,6 +24,7 @@ if [ -z "${NS}" ]; then
 else
     echo -e "Registry namespace ${REGISTRY_NAMESPACE} found."
 fi
+
 echo -e "Existing images in registry"
 bx cr images
 

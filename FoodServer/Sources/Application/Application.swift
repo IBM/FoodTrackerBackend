@@ -10,7 +10,9 @@ import SwiftKueryPostgreSQL
 
 public let projectPath = ConfigurationManager.BasePath.project.path
 public let health = Health()
-extension Meal: Model { }
+extension Meal: Model {
+    static var idColumnName = "name"
+}
 
 class Persistence {
     static func setUp() {
@@ -22,6 +24,7 @@ class Persistence {
 public class App {
     let router = Router()
     let cloudEnv = CloudEnv()
+
     public init() throws {
         // Run the metrics initializer
         initializeMetrics(router: router)
@@ -30,9 +33,9 @@ public class App {
     func postInit() throws {
         // Endpoints
         initializeHealthRoutes(app: self)
-        
         router.post("/meals", handler: storeHandler)
         router.get("/meals", handler: loadHandler)
+        router.get("/summary", handler: summaryHandler)
         Persistence.setUp()
         do {
             try Meal.createTableSync()
@@ -48,7 +51,15 @@ public class App {
     func loadHandler(completion: @escaping ([Meal]?, RequestError?) -> Void ) {
         Meal.findAll(completion)
     }
-
+    
+    func summaryHandler(completion: @escaping (Summary?, RequestError?) -> Void ) {
+        Meal.findAll { meals, error in
+            if let meals = meals {
+                completion(Summary(meals), nil)
+            }
+        }
+    }
+    
     public func run() throws {
         try postInit()
         Kitura.addHTTPServer(onPort: cloudEnv.port, with: router)

@@ -193,7 +193,6 @@ class MealTableViewController: UITableViewController {
          for meal in meals {
             saveToServer(meal: meal)
          }
- 
         do {
             let data = try PropertyListEncoder().encode(meals)
             let isSuccessfulSave  = NSKeyedArchiver.archiveRootObject(data, toFile: MealTableViewController.ArchiveURL.path)

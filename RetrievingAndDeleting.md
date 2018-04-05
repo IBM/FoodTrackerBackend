@@ -7,7 +7,9 @@ This tutorial follows on from the FoodTracker Application and server created by 
 If you have not completed the [FoodTrackerBackend](https://github.com/IBM/FoodTrackerBackend) tutorial go to the [CompletedFoodTracker](https://github.com/IBM/FoodTrackerBackend/tree/CompletedFoodTracker) branch and follow the README instructions.
 
 ### Retrieving Meals from the FoodServer  
-The following code can be added to the FoodTracker app and will query the saved Meals from the server, and update the TableView:  
+1. Open the FoodTracker workspace
+ `open ~/FoodTrackerBackend/iOS/FoodTracker/FoodTracker.xcworkspace/`
+2. Inside MealTableViewController.swift add the following function:
 ```swift
     private func loadFromServer() {
         guard let client = KituraKit(baseURL: "http://localhost:8080") else {
@@ -30,28 +32,52 @@ The following code can be added to the FoodTracker app and will query the saved 
         }
     }
 ```  
-Try inserting this into the FoodTracker app and loading the Meals from the FoodServer.
+The above code will query the saved Meals from the server, and update the TableView.
 
-### Deleting Meals from the FoodServer  
-The design of the FoodTracker app is such that it saves all of the Meals when any Meal is added or removed, overwriting the previous store of Meals. Whilst this provides an implementation, it is not one that scales to large numbers of Meals.
-
-Support for deleting Meals from the FoodServer can be added by adding a REST API that responds to a DELETE request, with an additional identifier that provides information about which meal to delete.
-
-1. The following code adds a DELETE handler to the FoodServer for a single Meal:  
+3. Call this new function by replacing the `loadMeals` function with:
 ```swift
-    router.delete("/meal", handler: deleteHandler)
-```  
-With the following handler implementation:  
-```swift
-    func deleteHandler(id: String, completion: (RequestError?) -> Void ) {
-        print("Deleting \(id) from mealStore")
-        mealStore[id] = nil
-        completion(nil)
+private func loadMeals() -> [Meal]?  {
+        loadFromServer()
+        return meals
     }
 ```
-Note that rather than receiving a Meal, this receives an `id`. The `id` is an `Identifier` that is added to the URL in order to denote which Meal to delete. Kitura extends String to conform to Identifier, so strings can be used directly.  
+4. Inside your `saveMeals` function, replace:
+```swift
+do {
+    let data = try PropertyListEncoder().encode(meals)
+    let isSuccessfulSave  = NSKeyedArchiver.archiveRootObject(data, toFile: MealTableViewController.ArchiveURL.path)
+    if isSuccessfulSave {
+        os_log("Meals successfully saved.", log: OSLog.default, type: .debug)
+    } else {
+        os_log("Failed to save meals...", log: OSLog.default, type: .error)
+    }
+} catch {
+    os_log("Failed to save meals...", log: OSLog.default, type: .error)
+}
+```  
+with:
+```swift
+loadFromServer()
+```
 
-2. The following code can be used in the FoodTracker app to make the call to the FoodServer. Here the Meal name is used for the Identifier.  
+This change makes the food tracker app to load it's meals from the server's database, instead of a local cache. You can test this by closing then deleting the app in the simulator and restarting the food tracker. All your meals from the Server will persist since they have been loaded from the database.
+### Deleting Meals from the FoodServer  
+Support for deleting Meals from the FoodServer can be added by adding a REST API that responds to a DELETE request, with an additional identifier that provides information about which meal to delete.
+1. Open the FoodServer project
+`open  ~/FoodTrackerBackend/FoodServer/FoodServer.xcodeproj/`
+2. Add the following code as a DELETE handler for a single Meal:
+```swift
+router.delete("/meal", handler: deleteHandler)
+```  
+With the following deleteHandler implementation:  
+```swift
+func deleteHandler(id: String, completion: @escaping (RequestError?) -> Void ) {
+    Meal.delete(id: id, completion)
+}
+```
+Note that rather than receiving a Meal, this receives an `id`. The `id` is an `Identifier` that is added to the URL in order to denote which Meal to delete. Kitura extends String to conform to Identifier, so strings can be used directly. Here, we will be using the meal name as the `Identifier`.
+
+3. The following function is added to MealTableViewController.swift to make the DELETE call to the FoodServer.
 ```swift
     private func deleteFromServer(meal: Meal) {
         guard let client = KituraKit(baseURL: "http://localhost:8080") else {
@@ -67,3 +93,13 @@ Note that rather than receiving a Meal, this receives an `id`. The `id` is an `I
         }
     }
 ```
+4. Call this new function inside `func tableView` by replacing:
+```swift
+meals.remove(at: indexPath.row)
+```
+with:
+```swift
+deleteFromServer(meal: meals[indexPath.row])
+```
+
+### Congratulations, Your iOS app will now load and delete meals from the server!!!

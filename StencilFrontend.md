@@ -99,16 +99,16 @@ Here we define a new route for our server which we will use to return the format
 Add the following code on the line below `router.add(templateEngine: StencilTemplateEngine())`:
 ```swift
 router.get("/foodtracker") { request, response, next in
-    defer {
-        next()
-    }
+    next()
 }
 ```
 2. Build a JSON string description of the FoodTracker meal store.
-Add the following code inside your “/foodtracker" route Below the defer closure:
+Add the following code inside your “/foodtracker" route above `next()`:
+
 ```swift
 Meal.findAll { (result: [Meal]?, error: RequestError?) in
     guard let meals = result else {
+        next()
         return
     }
     var allMeals: [String: [[String:Any]]] = ["meals" :[]]
@@ -118,7 +118,7 @@ Meal.findAll { (result: [Meal]?, error: RequestError?) in
 }
 ```
 3. Render the template and add it to your `response`.
-Add the following line after the `for meal in meals` loop:
+Add the following line above `next()`:
 ```swift
 do {
     try response.render("FoodTemplate.stencil", context: allMeals)
@@ -133,10 +133,8 @@ This will render the `FoodTemplate.stencil` file using `allMeals` to embed varia
 ```swift
 router.get("/foodtracker") { request, response, next in
     Meal.findAll { (result: [Meal]?, error: RequestError?) in
-        defer {
-            next()
-        }
         guard let meals = result else {
+            next()
             return
         }
         var allMeals: [String: [[String:Any]]] = ["meals" :[]]
@@ -148,13 +146,18 @@ router.get("/foodtracker") { request, response, next in
         } catch let error {
             response.send(json: ["Error": error.localizedDescription])
         }
+        next()
     }
 }
 ```
 We can test this route by running the FoodTracker application and the FoodServer. Add a meal in the app and then go to [http://localhost:8080/foodtracker](http://localhost:8080/foodtracker). This will now display a line saying how many meals are present in the app and a list of the meal names and ratings.
 
+### Congratulations, you have successfully served a dynamic HTML webpage!
+The next sections will take you through saving and displaying the meal photograph, receiving new meals from a web form and adding CSS to the webpage.
+
 ## Displaying a Photo using a Static File Server
 Our meal tracker application allows users to upload a photograph of their meal. We would like to add this photograph to our web page as a picture and not as a string of data as it is currently displayed. To achieve this we will save the user photos and then implement a Static File Server which will serve the photos using our Stencil template.
+**Note** If you have completed "AddWebApplication.md", you will already have the required Static File Server.
 
 ### Saving photos on the server
 1. In the terminal, create the "public" directory:
@@ -332,8 +335,7 @@ router.post("/foodtracker") { request, response, next in
 	 }
 }
 ```
-
-Restart your server to add your new changes. When you add a new meal at [http://localhost:8080/foodtracker](http://localhost:8080/foodtracker), you should see the webpage update with your new meal.
+Restart your server to add your new changes. When you add a new meal at [http://localhost:8080/foodtracker](http://localhost:8080/foodtracker), you should see the webpage update with your new meal. Since the requests are asyc, you may need to refresh the webpage to see the new meal.
 
 ## Adding HTML and CSS
 

@@ -23,34 +23,44 @@ Follow the steps below to set up your completed iOS Foodtracker and Kitura serve
 
 `sudo gem install cocoapods`
 
-3. Open a terminal window and clone the FoodTracker application and Server:
+3. Install PostgreSQL:
+```
+brew install postgresql
+brew services start postgresql
+```
+
+4. Create a database called FoodDatabase to store the data:
+```
+createdb FoodDatabase
+```
+
+5. Open a terminal window and clone the FoodTracker application and Server:
 
 `git clone https://github.com/IBM/FoodTrackerBackend.git`
 
-4. Switch to the "completedFoodBackend" branch:
+6. Switch to the "completedFoodBackend" branch:
 ```
 cd FoodTrackerBackend
 git checkout CompletedFoodTracker
 ```
-5. Use Cocoapods to install app dependencies:
+7. Use Cocoapods to install app dependencies:
 ```
 cd iOS/FoodTracker
 pod install
 ```
-6. Open the FoodTracker Application in Xcode
+8. Open the FoodTracker Application in Xcode
 ```
 open FoodTracker.xcworkspace/
 ```
 This Xcode workspace contains the food tracker mobile app, which can be run by clicking the play button.
 
-7. Generate the server Xcode project:
+9. Generate the server Xcode project:
 ```
 cd ../../FoodServer/
 swift package generate-xcodeproj
 open FoodServer.xcodeproj/
 ```
-8. Click on the "FoodServer-Package" text on the top-left of the toolbar and select "Edit scheme" from the dropdown menu.
-9. In "Run" click on the "Executable" dropdown, select FoodServer and click Close.
+10. In the top left corner of Xcode you should a small terminal icon with the text "FoodServer-Package" next to it. Click this icon and then click "FoodServer" from the dropdown menu.
 
 Now when you press play, Xcode will start your FoodTracker server listening on port 8080. You can see this by going to [http://localhost:8080/](http://localhost:8080/ ) which will show the default Kitura landing page.
 

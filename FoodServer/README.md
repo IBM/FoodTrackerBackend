@@ -81,7 +81,6 @@ To build the two docker images, run the following commands from the root directo
 You may customize the names of these images by specifying a different value after the `-t` option.
 
 To compile the application using the tools docker image, run:
-
 * `docker run -v $PWD:/swift-project -w /swift-project myapp-build /swift-utils/tools-utils.sh build release`
 
 To run the application:
@@ -94,7 +93,6 @@ You can deploy your application to Bluemix using:
 
 #### CloudFoundry CLI
 You can deploy the application to IBM Cloud using the CloudFoundry command-line:
-
 1. Install the Cloud Foundry command-line (https://docs.cloudfoundry.org/cf-cli/install-go-cli.html)
 1. Ensure all configured services have been provisioned
 1. Run `cf push` from the project root directory
@@ -103,7 +101,6 @@ The Cloud Foundry CLI will not provision the configured services for you, so you
 
 #### IBM Cloud toolchain
 You can also set up a default IBM Cloud Toolchain to handle deploying your application to IBM Cloud. This is achieved by publishing your application to a publicly accessible github repository and using the "Create Toolchain" button below. In this case configured services will be automatically provisioned, once, during toolchain creation.
-
 
 [![Create Toolchain](https://console.ng.bluemix.net/devops/graphics/create_toolchain_button.png)](https://console.ng.bluemix.net/devops/setup/deploy/)
 
