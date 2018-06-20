@@ -348,7 +348,7 @@ open Package.swift
 ```
 3. Add the Swift-Kuery-ORM and Swift-Kuery-PostgreSQL packages.
 ```swift
-.package(url: "https://github.com/IBM-Swift/Swift-Kuery-ORM.git", .upToNextMinor(from: "0.0.1")),
+.package(url: "https://github.com/IBM-Swift/Swift-Kuery-ORM.git", .upToNextMinor(from: "0.1.0")),
 .package(url: "https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL.git", from: "1.1.0"),
 ```
 below the line `.package(url: "https://github.com/IBM-Swift/Health.git", from: "1.0.0"),`
