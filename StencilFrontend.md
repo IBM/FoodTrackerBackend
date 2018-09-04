@@ -158,14 +158,14 @@ Our meal tracker application allows users to upload a photograph of their meal. 
 **Note** If you have completed "AddWebApplication.md", you will already have the required Static File Server.
 
 ### Saving photos on the server
-1. In the terminal, create the "public" directory:
+1. In the terminal, create the `public` directory:
 ```
 cd ~/FoodTrackerBackend/FoodServer
 mkdir public
 ```
-The default location for a static file server to serve files from is the ./public directory so we will create this directory on our server to save our users' pictures in.
+The default location for a static file server to serve files from is the `./public` directory so we will create this directory on our server to save our users' pictures in.
 
-2. Open your `Sources > Application > Application.swift` file.
+2. Open your `Sources` > `Application` > `Application.swift` file.
 3. Set up the file handler to write to the web hosting directory by adding the following under the `cloudEnv` declaration:
 ```swift
 private var fileManager = FileManager.default
@@ -177,7 +177,7 @@ Add the following code to the beginning of your `storeHandler`:
 let path = "\(self.rootPath)/\(meal.name).jpg"
 fileManager.createFile(atPath: path, contents: meal.photo)
 ```
-This will create a file with the name of your meal and a .jpg extension inside the public directory of your server. If the file already exists it will overwrite it with a new picture. You can test this by re-running the FoodServer with your changes and adding a meal - the photo should appear in the "public" directory you just created.
+This will create a file with the name of your meal and a .jpg extension inside the public directory of your server. If the file already exists it will overwrite it with a new picture. You can test this by re-running the FoodServer with your changes and adding a meal - the photo should appear in the `public` directory you just created.
 
 5. Your `storeHandler` function should now look as follows:
 ```swift
@@ -239,7 +239,7 @@ This code creates a multipart form with three fields. A name text box, a rating 
 
 ### Using BodyParser on the POST route of "/foodtracker"
 
-1. Open the FoodServer  `Sources > Application > Application.swift` file.
+1. Open the FoodServer  `Sources` > `Application` > `Application.swift` file.
 2. Connect the `BodyParser` middleware.
 
 Inside the `postInit()` function, add `BodyParser` to your route:
@@ -353,7 +353,7 @@ mv Example.stencil FoodServer/Views/
 
 ### Change the target of `response.render` to display `Example.Stencil`
 
-1. Open your `Sources > Application > Application.swift` file.
+1. Open your `Sources` > `Application` > `Application.swift` file.
 
 2. Replace `FoodTemplate.stencil` with `Example.stencil` in the `response.render` call:
 ```swift
