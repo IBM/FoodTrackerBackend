@@ -17,6 +17,7 @@ Upon completion of this tutorial there are several [next steps](#next-steps) you
 - [Add a Website Frontend using the Stencil Template Engine](StencilFrontend.md)
 - [Add Support for Retrieving and Deleting Meals from the FoodServer](RetrievingAndDeleting.md)
 - [Add a Web Application to the Kitura server](AddWebApplication.md)
+- [Add HTTP Basic authentication to the Kitura server](BasicAuthentication.md)
 - [Deploy and host the Kitura FoodServer in the Cloud](DeployToCloud.md)
 - [View a sample Todo list application using Kitura](https://github.com/IBM-Swift/iOSSampleKituraKit)
 
@@ -162,7 +163,7 @@ Add the following as another function in the App class:
 
 
 1. Run the server project in Xcode
-    1. In the top left corner of Xcode you should a small terminal icon with the text "FoodServer-Package" next to it. Click this icon and then click "FoodServer" from the dropdown menu.
+    1. In the top left corner of Xcode you should see a small toolbox icon with the text "FoodServer-Package" next to it. Click this icon and then click "FoodServer" from the dropdown menu.
     2. Press the Run button or use the ⌘+R key shortcut.
     3. Select "Allow incoming network connections" if you are prompted.
 
@@ -348,7 +349,7 @@ open Package.swift
 ```
 3. Add the Swift-Kuery-ORM and Swift-Kuery-PostgreSQL packages.
 ```swift
-.package(url: "https://github.com/IBM-Swift/Swift-Kuery-ORM.git", .upToNextMinor(from: "0.1.0")),
+.package(url: "https://github.com/IBM-Swift/Swift-Kuery-ORM.git", .upToNextMinor(from: "0.3.0")),
 .package(url: "https://github.com/IBM-Swift/Swift-Kuery-PostgreSQL.git", from: "1.1.0"),
 ```
 below the line `.package(url: "https://github.com/IBM-Swift/Health.git", from: "1.0.0"),`
@@ -480,12 +481,11 @@ You can verify this by:
 3. Accessing your database:
 `psql FoodDatabase`
 4. Viewing your meals table:
-`SELECT name, rating FROM meals;`
+`SELECT name, rating FROM "Meals";`
 This should produce a table with the name and the rating of your newly added meal.
 
 **NOTE** We do not print out the photo because it is too large
-
-
+5. Close `psql` by entering `\q`
 Now when you create a meal in the application, the server will save it to the PostgreSQL database.
 
 ### Handling an HTTP GET request
@@ -503,10 +503,10 @@ func loadHandler(completion: @escaping ([Meal]?, RequestError?) -> Void ) {
 }
 ```
 
-Now when you perform a `GET` call to your server it will retrieve the meals from your database.
+Now when you perform a `GET` call to your server it will retrieve the meals from your database.  
+Update the summaryHandler function to get the meals from the database:  
 
-Update the summaryHandler function to get the meals from the database:
-3.  Inside the `summaryHandler` function add the following line:
+3. Inside the `summaryHandler` function add the following line:  
 ```swift
 Meal.findAll { meals, error in
     guard let meals = meals else {
@@ -547,6 +547,9 @@ The current implementation of the Kitura FoodServer has support for retrieving a
 ### Add a Web Application to the Kitura server
 Now that the Meals from the FoodTracker app are being stored on a server, it becomes possible to start building a web application that also provides users with access to the stored Meal data.
 The following steps describe how to start to [Build a FoodTracker Web Application](AddWebApplication.md).
+
+### Add HTTP Basic authentication to the Kitura server
+The current implementation of the Kitura FoodServer will allow anyone to request all the meals. We can add HTTP Basic authentication to make the routes require a username and password. This allows you to authenticate a user and have the  server respond accordingly.
 
 ### Deploy and host the Kitura FoodServer in the Cloud
 In order for a real iOS app to connect to a Kitura Server, it needs to be hosted at a public URL that the iOS app can reach.
