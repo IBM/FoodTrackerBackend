@@ -18,8 +18,6 @@ spec:
         app: "{{  .Chart.Name }}-selector"
         version: "current"
     spec:
-      imagePullSecrets:
-      - name: "{{ .Values.image.pullSecret }}"
       containers:
       - name: "{{  .Chart.Name  }}"
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -39,3 +37,8 @@ spec:
         env:
           - name: PORT
             value : "{{ .Values.service.servicePort }}"
+          - name: APPLICATION_NAME
+            value: "{{ .Release.Name }}"
+{{- if .Values.generatedBindings.enabled }}
+{{.Files.Get "bindings.yaml" | indent 10 }}
+{{- end }}

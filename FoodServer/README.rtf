@@ -1,0 +1,182 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs32 Scaffolded Swift Kitura server application\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This scaffolded application provides a starting point for creating Swift applications running on {\field{\*\fldinst{HYPERLINK "http://www.kitura.io/"}}{\fldrslt{\ul
+Kitura
+}}}
+.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 Table of Contents\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#requirements"}}{\fldrslt{\ul
+Requirements
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#project-contents"}}{\fldrslt{\ul
+Project contents
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#run"}}{\fldrslt{\ul
+Run
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#configuration"}}{\fldrslt{\ul
+Configuration
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#deploy-to-ibm-cloud"}}{\fldrslt{\ul
+Deploy to IBM Cloud
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#service-descriptions"}}{\fldrslt{\ul
+Service descriptions
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#license"}}{\fldrslt{\ul
+License
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#generator"}}{\fldrslt{\ul
+Generator
+}}}
+\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 Project contents\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This application has been generated with the following capabilities and services, which are described in full in their respective sections below:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#configuration"}}{\fldrslt{\ul
+CloudEnvironment
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#embedded-metrics-dashboard"}}{\fldrslt{\ul
+Embedded metrics dashboard
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#docker-files"}}{\fldrslt{\ul
+Docker files
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#iterative-development"}}{\fldrslt{\ul
+Iterative Development
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "#ibm-cloud-deployment"}}{\fldrslt{\ul
+IBM Cloud deployment
+}}}
+\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 Requirements\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\field{\*\fldinst{HYPERLINK "https://swift.org/download/"}}{\fldrslt{\ul
+Swift 4
+}}}
+\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 Run\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 To build and run the application:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab {\f1 swift build}\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab {\f1 .build/debug/FoodServer}\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 Docker\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 A description of the files related to Docker can be found in the {\field{\*\fldinst{HYPERLINK "#docker-files"}}{\fldrslt{\ul
+Docker files
+}}}
+ setion. To build the two docker images, run the following commands from the root directory of the project:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 docker build -t myapp-run .}\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 docker build -t myapp-build -f Dockerfile-tools .}\line You may customize the names of these images by specifying a different value after the {\f1 -t} option.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 To compile the application using the tools docker image, run:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 docker run -v $PWD:/swift-project -w /swift-project myapp-build /swift-utils/tools-utils.sh build release}\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 To run the application:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 docker run -it -p 8080:8080 -v $PWD:/swift-project -w /swift-project myapp-run sh -c .build-ubuntu/release/FoodServer}\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 Kubernetes\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 To deploy your application to your Kubernetes cluster, run {\f1 helm install --name myapp .} in the {\f1 /chart/FoodServer} directory. You need to make sure you change the {\f1 repository} variable in your {\f1 chart/FoodServer/values.yaml} file points to the docker image containing your runnable application.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 Configuration\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Your application configuration information for any services is stored in the {\f1 localdev-config.json} file in the {\f1 config} directory. This file is in the {\f1 .gitignore} to prevent sensitive information from being stored in git. The connection information for any configured services that you would like to access when running locally, such as username, password and hostname, is stored in this file.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The application uses the {\field{\*\fldinst{HYPERLINK "https://github.com/IBM-Swift/CloudEnvironment"}}{\fldrslt{\ul
+CloudEnvironment package
+}}}
+ to read the connection and configuration information from the environment and this file. It uses {\f1 mappings.json}, found in the {\f1 config} directory, to communicate where the credentials can be found for each service.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 If the application is running locally, it can connect to IBM Cloud services using unbound credentials read from this file. If you need to create unbound credentials you can do so from the IBM Cloud web console ({\field{\*\fldinst{HYPERLINK "https://console.ng.bluemix.net/docs/services/Cloudant/tutorials/create_service.html#creating-a-service-instance"}}{\fldrslt{\ul
+example
+}}}
+), or using the CloudFoundry CLI {\field{\*\fldinst{HYPERLINK "http://cli.cloudfoundry.org/en-US/cf/create-service-key.html"}}{\fldrslt{\ul
+{\f1 cf create-service-key} command
+}}}
+.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 When you push your application to IBM Cloud, these values are no longer used, instead the application automatically connects to bound services using environment variables.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 Iterative Development\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The {\f1 iterative-dev.sh} script is included in the root of the generated Swift project and allows for fast & easy iterations for the developer. Instead of stopping the running Kitura server to see new code changes, while the script is running, it will automatically detect changes in the project's {\b .swift} files and recompile the app accordingly.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 To use iterative development:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab For native OS, execute the {\f1 ./iterative-dev.sh} script from the root of the project.\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab With docker, shell into the tools container mentioned above, and run the {\f1 ./swift-project/iterative-dev.sh} script. File system changes are detected using a low-tech infinitely looping poll mechanism, which works in both local OS/filesystem and across host OS->Docker container volume scenarios.\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 Deploy to IBM Cloud\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 You can deploy your application to Bluemix using:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab the {\field{\*\fldinst{HYPERLINK "#cloudfoundry-cli"}}{\fldrslt{\ul
+CloudFoundry CLI
+}}}
+\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab an {\field{\*\fldinst{HYPERLINK "#ibm-cloud-toolchain"}}{\fldrslt{\ul
+IBM Cloud toolchain
+}}}
+\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 CloudFoundry CLI\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 You can deploy the application to IBM Cloud using the CloudFoundry command-line:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab Install the Cloud Foundry command-line ({\field{\*\fldinst{HYPERLINK "https://docs.cloudfoundry.org/cf-cli/install-go-cli.html"}}{\fldrslt{\ul
+https://docs.cloudfoundry.org/cf-cli/install-go-cli.html
+}}}
+)\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab Ensure all configured services have been provisioned\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab Run {\f1 cf push} from the project root directory\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The Cloud Foundry CLI will not provision the configured services for you, so you will need to do this manually using the IBM Cloud web console ({\field{\*\fldinst{HYPERLINK "https://console.ng.bluemix.net/docs/services/Cloudant/tutorials/create_service.html#creating-a-service-instance"}}{\fldrslt{\ul
+example
+}}}
+) or the CloudFoundry CLI ({\f1 cf create-service} command)[{\field{\*\fldinst{HYPERLINK "http://cli.cloudfoundry.org/en-US/cf/create-service.html"}}{\fldrslt{\ul
+http://cli.cloudfoundry.org/en-US/cf/create-service.html
+}}}
+]. The service names and types will need to match your {\field{\*\fldinst{HYPERLINK "#configuration"}}{\fldrslt{\ul
+configuration
+}}}
+.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 IBM Cloud toolchain\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 You can also set up a default IBM Cloud Toolchain to handle deploying your application to IBM Cloud. This is achieved by publishing your application to a publicly accessible github repository and using the "Create Toolchain" button below. In this case configured services will be automatically provisioned, once, during toolchain creation.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\field{\*\fldinst{HYPERLINK "https://console.ng.bluemix.net/devops/setup/deploy/"}}{\fldrslt{\ul
+{\cf1 [image: https://console.ng.bluemix.net/devops/graphics/create_toolchain_button.png]\cf0}
+}}}
+\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 Service descriptions\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 Embedded metrics dashboard\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This application uses the {\field{\*\fldinst{HYPERLINK "https://github.com/RuntimeTools/SwiftMetrics"}}{\fldrslt{\ul
+SwiftMetrics package
+}}}
+ to gather application and system metrics.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 These metrics can be viewed in an embedded dashboard on {\f1 /swiftmetrics-dash}. The dashboard displays various system and application metrics, including CPU, memory usage, HTTP response metrics and more.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 Docker files\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The application includes the following files for Docker support:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 .dockerignore}\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 Dockerfile}\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 Dockerfile-tools}\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The {\f1 .dockerignore} file contains the files/directories that should not be included in the built docker image. By default this file contains the {\f1 Dockerfile} and {\f1 Dockerfile-tools}. It can be modified as required.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The {\f1 Dockerfile} defines the specification of the default docker image for running the application. This image can be used to run the application.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The {\f1 Dockerfile-tools} is a docker specification file similar to the {\f1 Dockerfile}, except it includes the tools required for compiling the application. This image can be used to compile the application.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Details on how to build the docker images, compile and run the application within the docker image can be found in the {\field{\*\fldinst{HYPERLINK "#run"}}{\fldrslt{\ul
+Run section
+}}}
+.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs24 IBM Cloud deployment\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Your application has a set of cloud deployment configuration files defined to support deploying your application to IBM Cloud:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 manifest.yml}\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 .bluemix/toolchain.yml}\line \par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\f1 .bluemix/pipeline.yml}\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 The {\field{\*\fldinst{HYPERLINK "https://console.ng.bluemix.net/docs/manageapps/depapps.html#appmanifest"}}{\fldrslt{\ul
+{\f1 manifest.yml}
+}}}
+ defines options which are passed to the Cloud Foundry {\f1 cf push} command during application deployment.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\field{\*\fldinst{HYPERLINK "https://console.ng.bluemix.net/docs/services/ContinuousDelivery/index.html"}}{\fldrslt{\ul
+IBM Cloud DevOps
+}}}
+ service provides toolchains as a set of tool integrations that support development, deployment, and operations tasks inside IBM Cloud, for both Cloud Foundry and Kubernetes applications. The {\field{\*\fldinst{HYPERLINK "#deploy-to-ibm-cloud"}}{\fldrslt{\ul
+"Create Toolchain"
+}}}
+ button creates a DevOps toolchain and acts as a single-click deploy to IBM Cloud including provisioning all required services.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 License\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 All generated content is available for use and modification under the permissive MIT License (see {\f1 LICENSE} file), with the exception of SwaggerUI which is licensed under an Apache-2.0 license (see {\f1 NOTICES.txt} file).\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs28 Generator\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This project was generated with {\field{\*\fldinst{HYPERLINK "https://github.com/IBM-Swift/generator-swiftserver"}}{\fldrslt{\ul
+generator-swiftserver
+}}}
+ v5.4.2.\par}
+}

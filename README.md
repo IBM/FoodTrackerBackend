@@ -60,11 +60,11 @@ cd ../../FoodServer/
 swift package generate-xcodeproj
 open FoodServer.xcodeproj/
 ```
-10. In the top left corner of Xcode you should a small terminal icon with the text "FoodServer-Package" next to it. Click this icon and then click "FoodServer" from the dropdown menu.
+10. In the top left corner of Xcode you should a small toolbox icon with the text "FoodServer-Package" next to it. Click this icon and then click "FoodServer" from the dropdown menu.
 
 Now when you press play, Xcode will start your FoodTracker server listening on port 8080. You can see this by going to [http://localhost:8080/](http://localhost:8080/ ) which will show the default Kitura landing page.
 
-To test the application and server are working, add a meal inside the application and go to [http://localhost:8080/meals](http://localhost:8080/meals). The server will display the name, the encoded image and the rating of the meals in your app.
+To test the application and server are working, add a meal inside the application and go to [http://localhost:8080/summary](http://localhost:8080/summary). The server will display the name and rating of the meals in your app.
 
 ## Next Steps
 From this completed Foodtracker, the following tasks can be completed to update your application.
@@ -78,6 +78,9 @@ The current implementation of the Kitura FoodServer has support for retrieving a
 ### Add a Web Application to the Kitura server
 Now that the Meals from the FoodTracker app are being stored on a server, it becomes possible to start building a web application that also provides users with access to the stored Meal data.
 The following steps describe how to start to [Build a FoodTracker Web Application](AddWebApplication.md)
+
+### Add HTTP Basic authentication to the Kitura server
+The current implementation of the Kitura FoodServer will allow anyone to request all the meals. We can add HTTP Basic authentication to make the routes require a username and password. This allows you to authenticate a user and have the  server respond accordingly.
 
 ### Deploy and host the Kitura FoodServer in the Cloud
 In order for a real iOS app to connect to a Kitura Server, it needs to be hosted at a public URL that the iOS app can reach.

@@ -8,6 +8,7 @@
 
 import UIKit
 import os.log
+// UNCOMMENT TO USE SWIFT BACKEND SERVER
 import KituraKit
 
 class MealTableViewController: UITableViewController {
@@ -126,7 +127,7 @@ class MealTableViewController: UITableViewController {
             }
             
             guard let selectedMealCell = sender as? MealTableViewCell else {
-                fatalError("Unexpected sender: \(sender)")
+                fatalError("Unexpected sender: \(String(describing: sender))")
             }
             
             guard let indexPath = tableView.indexPath(for: selectedMealCell) else {
@@ -137,7 +138,7 @@ class MealTableViewController: UITableViewController {
             mealDetailViewController.meal = selectedMeal
             
         default:
-            fatalError("Unexpected Segue Identifier; \(segue.identifier)")
+            fatalError("Unexpected Segue Identifier; \(String(describing: segue.identifier))")
         }
     }
     
@@ -193,6 +194,7 @@ class MealTableViewController: UITableViewController {
          for meal in meals {
             saveToServer(meal: meal)
          }
+ 
         do {
             let data = try PropertyListEncoder().encode(meals)
             let isSuccessfulSave  = NSKeyedArchiver.archiveRootObject(data, toFile: MealTableViewController.ArchiveURL.path)
@@ -221,6 +223,7 @@ class MealTableViewController: UITableViewController {
      * Provide a function that calls the ServerMealAPI.serverMealCreate() API. The code is taken from
      * the documentation of the generated FoodTracker connector SDK.
      */
+     // UNCOMMENT TO USE SWIFT BACKEND SERVER
      private func saveToServer(meal: Meal) {
         guard let client = KituraKit(baseURL: "http://localhost:8080") else {
             print("Error creating KituraKit client")
@@ -234,5 +237,7 @@ class MealTableViewController: UITableViewController {
             print("Saving meal to Kitura succeeded")
         }
      }
+     
+    
 }
 

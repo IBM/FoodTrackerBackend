@@ -6,7 +6,6 @@ image:
   repository: registry.ng.bluemix.net/replace-me-namespace/foodserver
   tag: v1.0.0
   pullPolicy: Always
-  pullSecret: regsecret
   resources:
     requests:
       cpu: 200m
@@ -15,7 +14,7 @@ livenessProbe:
   initialDelaySeconds: 3000
   periodSeconds: 1000
 service:
-  name: Node
+  name: swift
   type: NodePort
   servicePort: 8080
 hpa:
@@ -27,7 +26,6 @@ hpa:
       targetAverageUtilization: 70
     memory:
       targetAverageUtilization: 70
-services:
 base:
   enabled: false
   replicaCount: 1
@@ -37,3 +35,5 @@ base:
 istio:
   enabled: false
   weight: 100
+generatedBindings:
+  enabled: true

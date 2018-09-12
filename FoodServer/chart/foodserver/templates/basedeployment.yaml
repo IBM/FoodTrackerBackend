@@ -36,4 +36,7 @@ spec:
         env:
           - name: PORT
             value : "{{ .Values.service.servicePort }}"
+{{- if .Values.generatedBindings.enabled }}
+{{.Files.Get "bindings.yaml" | indent 10 }}
+{{- end }}
 {{ end }}

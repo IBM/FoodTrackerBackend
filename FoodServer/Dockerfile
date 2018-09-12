@@ -1,5 +1,5 @@
-FROM ibmcom/swift-ubuntu-runtime:4.0
-MAINTAINER IBM Swift Engineering at IBM Cloud
+FROM ibmcom/swift-ubuntu-runtime:4.1.1
+LABEL maintainer="IBM Swift Engineering at IBM Cloud"
 LABEL Description="Template Dockerfile that extends the ibmcom/swift-ubuntu-runtime image."
 
 # We can replace this port with what the user wants

@@ -1,0 +1,3 @@
+.build/							usr/src/FoodServer
+terraform/scripts/install.sh	usr/src/FoodServer
+terraform/scripts/start.sh		usr/src/FoodServer

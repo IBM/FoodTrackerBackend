@@ -10,6 +10,7 @@ import SwiftKueryPostgreSQL
 
 public let projectPath = ConfigurationManager.BasePath.project.path
 public let health = Health()
+
 extension Meal: Model {
     static var idColumnName = "name"
 }
@@ -24,7 +25,7 @@ class Persistence {
 public class App {
     let router = Router()
     let cloudEnv = CloudEnv()
-
+    
     public init() throws {
         // Run the metrics initializer
         initializeMetrics(router: router)
@@ -43,7 +44,7 @@ public class App {
             print(error)
         }
     }
-    
+
     func storeHandler(meal: Meal, completion: @escaping (Meal?, RequestError?) -> Void ) {
         meal.save(completion)
     }
@@ -54,9 +55,11 @@ public class App {
     
     func summaryHandler(completion: @escaping (Summary?, RequestError?) -> Void ) {
         Meal.findAll { meals, error in
-            if let meals = meals {
-                completion(Summary(meals), nil)
+            guard let meals = meals else {
+                completion(nil, .internalServerError)
+                return
             }
+            completion(Summary(meals), nil)
         }
     }
     

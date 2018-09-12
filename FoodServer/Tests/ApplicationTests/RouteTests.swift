@@ -58,8 +58,31 @@ class RouteTests: XCTestCase {
 
         waitForExpectations(timeout: 10.0, handler: nil)
     }
-
+    
+    func testHealthRoute() {
+        let printExpectation = expectation(description: "The /health route will print UP, followed by a timestamp.")
+        
+        URLRequest(forTestWithMethod: "GET", route: "health")?
+            .sendForTestingWithKitura { data, statusCode in
+                if let getResult = String(data: data, encoding: String.Encoding.utf8) {
+                    XCTAssertEqual(statusCode, 200)
+                    XCTAssertTrue(getResult.contains("UP"), "UP not found in the result.")
+                    let date = Date()
+                    let calendar = Calendar.current
+                    let yearString = String(describing: calendar.component(.year, from: date))
+                    XCTAssertTrue(getResult.contains(yearString), "Failed to create String from date. Date is either missing or incorrect.")
+                } else {
+                    XCTFail("Unable to convert request Data to String.")
+                }
+                printExpectation.fulfill()
+        }
+        waitForExpectations(timeout: 10.0, handler: nil)
+    }
 }
+    
+    
+
+
 
 
 private extension URLRequest {

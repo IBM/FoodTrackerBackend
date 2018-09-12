@@ -1,12 +1,15 @@
 import LoggerAPI
+import Health
+import KituraContracts
 
 func initializeHealthRoutes(app: App) {
-    app.router.get("/health") { request, response, _ in
-        let result = health.status.toSimpleDictionary()
+    
+    app.router.get("/health") { (respondWith: (Status?, RequestError?) -> Void) -> Void in
         if health.status.state == .UP {
-            try response.send(json: result).end()
+            respondWith(health.status, nil)
         } else {
-            try response.status(.serviceUnavailable).send(json: result).end()
+            respondWith(nil, RequestError(.serviceUnavailable, body: health.status))
         }
     }
+    
 }
