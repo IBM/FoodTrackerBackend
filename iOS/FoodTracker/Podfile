@@ -6,7 +6,7 @@ target 'FoodTracker' do
   use_frameworks!
 
   # Pods for FoodTracker
-  pod 'KituraKit', :git => 'https://github.com/IBM-Swift/KituraKit.git', :branch => 'pod'
+  pod 'KituraKit'
 
   target 'FoodTrackerTests' do
     inherit! :search_paths
