@@ -243,7 +243,7 @@ pod init
    3. Under the "# Pods for FoodTracker" line add:
    ```
    # Pods for FoodTracker
-   pod 'KituraKit', :git => 'https://github.com/IBM-Swift/KituraKit.git', :branch => 'pod'
+   pod 'KituraKit'
    ```
    4. Save and close the file
 4. Install KituraKit:
